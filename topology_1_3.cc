@@ -37,6 +37,7 @@ using namespace ns3;
  */
 NS_LOG_COMPONENT_DEFINE("CttcNrTrafficNgmnMixed");
 
+
 class RadioNetworkParametersHelper
 {
   public:
@@ -648,6 +649,111 @@ operator>>(std::istream& is, TrafficTypeConf& item)
     item = (TrafficTypeConf)inputValue;
     return is;
 }
+void handler(int arg0, int arg1)
+{
+std::cout << "handler called with argument arg0=" << arg0 << " and arg1=" << arg1 << std::endl;
+}
+
+void reportFlowStats(Ptr<FlowMonitor> monitor,Ptr<Ipv4FlowClassifier> classifier,std::string filename , std::ofstream& outFile){
+    std::cout << "I've been called inside! \n ";
+    
+    FlowMonitor::FlowStatsContainer stats = monitor->GetFlowStats();
+    // Redefining because we're prototyping
+    Time simTime = MilliSeconds(1400);
+    Time appStartTime = MilliSeconds(400);
+    double averageFlowThroughput = 0.0;
+    double averageFlowDelay = 0.0;
+
+    double delayValues[stats.size()];
+    uint64_t cont = 0;
+
+    outFile.open(filename.c_str(), std::ofstream::out | std::ofstream::trunc);
+    if (!outFile.is_open())
+    {
+        std::cerr << "Can't open file " << filename << std::endl;
+    }
+
+    outFile.setf(std::ios_base::fixed);
+
+    for (std::map<FlowId, FlowMonitor::FlowStats>::const_iterator i = stats.begin();
+         i != stats.end();
+         ++i)
+    {
+        Ipv4FlowClassifier::FiveTuple t = classifier->FindFlow(i->first);
+        std::stringstream protoStream;
+        protoStream << (uint16_t)t.protocol;
+        if (t.protocol == 6)
+        {
+            protoStream.str("TCP");
+        }
+        if (t.protocol == 17)
+        {
+            protoStream.str("UDP");
+        }
+        std::cout << "Flow " << i->first << " (" << t.sourceAddress << ":" << t.sourcePort << " -> "
+                  << t.destinationAddress << ":" << t.destinationPort << ") proto "
+                  << protoStream.str() << "\n";
+        std::cout << "  Tx Packets: " << i->second.txPackets << "\n";
+        std::cout << "  Tx Bytes:   " << i->second.txBytes << "\n";
+        std::cout << "  TxOffered:  "
+                  << i->second.txBytes * 8.0 / (simTime - appStartTime).GetSeconds() / 1000.0 /
+                         1000.0
+                  << " Mbps\n";
+        std::cout << "  Rx Packets: " << i->second.rxPackets << "\n";
+        std::cout << "  Rx Bytes:   " << i->second.rxBytes << "\n";
+        if (i->second.rxPackets > 0)
+        {
+            // Measure the duration of the flow from receiver's perspective
+            // double rxDuration = i->second.timeLastRxPacket.GetSeconds () -
+            // i->second.timeFirstTxPacket.GetSeconds ();
+            double rxDuration = (simTime - appStartTime).GetSeconds();
+
+            averageFlowThroughput += i->second.rxBytes * 8.0 / rxDuration / 1000 / 1000;
+            averageFlowDelay += 1000 * i->second.delaySum.GetSeconds() / i->second.rxPackets;
+            delayValues[cont] = 1000 * i->second.delaySum.GetSeconds() / i->second.rxPackets;
+            cont++;
+
+            std::cout << "  Throughput: " << i->second.rxBytes * 8.0 / rxDuration / 1000 / 1000
+                      << " Mbps\n";
+            std::cout << "  Mean delay:  "
+                      << double(1000 * i->second.delaySum.GetSeconds()) / (i->second.rxPackets)
+                      << " ms\n";
+            std::cout << "  Last packet delay: " << i->second.lastDelay.As(Time::MS) << "\n";
+            // std::cout << "  Mean upt:  " << i->second.uptSum / i->second.rxPackets / 1000/1000 <<
+            // " Mbps \n";
+            std::cout << "  Mean jitter:  "
+                      << 1000 * i->second.jitterSum.GetSeconds() / i->second.rxPackets << " ms\n";
+        }
+        else
+        {
+            // outFile << "  Throughput:  0 Mbps\n";
+            // outFile << "  Mean delay:  0 ms\n";
+            // outFile << "  Mean jitter: 0 ms\n";
+        }
+        // outFile << "  Rx Packets: " << i->second.rxPackets << "\n";
+    }
+    std::sort(delayValues, delayValues + stats.size());
+    // for (uint32_t i = 0; i < stats.size(); i++)
+    //   {
+    //     std::cout << delayValues[i] << " ";
+    //   }
+    // double FiftyTileFlowDelay = (delayValues[stats.size()/2] + delayValues[stats.size()/2 -1])/2;
+    double FiftyTileFlowDelay = delayValues[stats.size() / 2];
+
+    outFile << "\n\n  Mean flow throughput: " << averageFlowThroughput / stats.size() << "\n";
+    outFile << "  Mean flow delay: " << averageFlowDelay / stats.size() << "\n";
+    outFile << "  Median flow delay: " << FiftyTileFlowDelay << "\n";
+
+    outFile.close();
+
+    std::ifstream f(filename.c_str());
+
+    if (f.is_open())
+    {
+        std::cout << f.rdbuf();
+    }
+    Simulator::Schedule(MilliSeconds(50),&reportFlowStats,monitor,classifier,filename,std::ref(outFile));
+}
 
 int
 main(int argc, char* argv[])
@@ -770,6 +876,7 @@ main(int argc, char* argv[])
     {
         LogComponentEnable("UdpClient", LOG_LEVEL_INFO);
         LogComponentEnable("UdpServer", LOG_LEVEL_INFO);
+        // LogComponentEnable("UdpDlPacketSinkLowLatApplcation", LOG_LEVEL_INFO);
         //      LogComponentEnable ("NrMacSchedulerOfdma", LOG_LEVEL_ALL);
     }
 
@@ -905,6 +1012,7 @@ main(int argc, char* argv[])
     p2ph.SetDeviceAttribute("DataRate", DataRateValue(DataRate("100Gb/s")));
     p2ph.SetDeviceAttribute("Mtu", UintegerValue(2500));
     p2ph.SetChannelAttribute("Delay", TimeValue(Seconds(0.000)));
+    p2ph.EnablePcapAll("leas-test",true);
     NetDeviceContainer internetDevices = p2ph.Install(pgw, remoteHost);
     Ipv4AddressHelper ipv4h;
     Ipv4StaticRoutingHelper ipv4RoutingHelper;
@@ -1841,110 +1949,19 @@ main(int argc, char* argv[])
     monitor->SetAttribute("DelayBinWidth", DoubleValue(0.001));
     monitor->SetAttribute("JitterBinWidth", DoubleValue(0.001));
     monitor->SetAttribute("PacketSizeBinWidth", DoubleValue(20));
+    std::string filename = outputDir + "/" + simTag;
 
     Simulator::Stop(simTime);
-    Simulator::Run();
-
-    // Print per-flow statistics
     monitor->CheckForLostPackets();
     Ptr<Ipv4FlowClassifier> classifier =
         DynamicCast<Ipv4FlowClassifier>(flowmonHelper.GetClassifier());
-    FlowMonitor::FlowStatsContainer stats = monitor->GetFlowStats();
-
-    double averageFlowThroughput = 0.0;
-    double averageFlowDelay = 0.0;
-
     std::ofstream outFile;
-    std::string filename = outputDir + "/" + simTag;
-    double delayValues[stats.size()];
-    uint64_t cont = 0;
+    Simulator::Schedule(MilliSeconds(500),&reportFlowStats,monitor,classifier,filename,std::ref(outFile));
+    // Simulator::Schedule(Seconds (0), &handler, 10, 5);
+    Simulator::Run();
 
-    outFile.open(filename.c_str(), std::ofstream::out | std::ofstream::trunc);
-    if (!outFile.is_open())
-    {
-        std::cerr << "Can't open file " << filename << std::endl;
-        return 1;
-    }
-
-    outFile.setf(std::ios_base::fixed);
-
-    for (std::map<FlowId, FlowMonitor::FlowStats>::const_iterator i = stats.begin();
-         i != stats.end();
-         ++i)
-    {
-        Ipv4FlowClassifier::FiveTuple t = classifier->FindFlow(i->first);
-        std::stringstream protoStream;
-        protoStream << (uint16_t)t.protocol;
-        if (t.protocol == 6)
-        {
-            protoStream.str("TCP");
-        }
-        if (t.protocol == 17)
-        {
-            protoStream.str("UDP");
-        }
-        std::cout << "Flow " << i->first << " (" << t.sourceAddress << ":" << t.sourcePort << " -> "
-                  << t.destinationAddress << ":" << t.destinationPort << ") proto "
-                  << protoStream.str() << "\n";
-        std::cout << "  Tx Packets: " << i->second.txPackets << "\n";
-        std::cout << "  Tx Bytes:   " << i->second.txBytes << "\n";
-        std::cout << "  TxOffered:  "
-                  << i->second.txBytes * 8.0 / (simTime - appStartTime).GetSeconds() / 1000.0 /
-                         1000.0
-                  << " Mbps\n";
-        std::cout << "  Rx Packets: " << i->second.rxPackets << "\n";
-        std::cout << "  Rx Bytes:   " << i->second.rxBytes << "\n";
-        if (i->second.rxPackets > 0)
-        {
-            // Measure the duration of the flow from receiver's perspective
-            // double rxDuration = i->second.timeLastRxPacket.GetSeconds () -
-            // i->second.timeFirstTxPacket.GetSeconds ();
-            double rxDuration = (simTime - appStartTime).GetSeconds();
-
-            averageFlowThroughput += i->second.rxBytes * 8.0 / rxDuration / 1000 / 1000;
-            averageFlowDelay += 1000 * i->second.delaySum.GetSeconds() / i->second.rxPackets;
-            delayValues[cont] = 1000 * i->second.delaySum.GetSeconds() / i->second.rxPackets;
-            cont++;
-
-            std::cout << "  Throughput: " << i->second.rxBytes * 8.0 / rxDuration / 1000 / 1000
-                      << " Mbps\n";
-            std::cout << "  Mean delay:  "
-                      << double(1000 * i->second.delaySum.GetSeconds()) / (i->second.rxPackets)
-                      << " ms\n";
-            std::cout << "  Last packet delay: " << i->second.lastDelay.As(Time::MS) << "\n";
-            // std::cout << "  Mean upt:  " << i->second.uptSum / i->second.rxPackets / 1000/1000 <<
-            // " Mbps \n";
-            std::cout << "  Mean jitter:  "
-                      << 1000 * i->second.jitterSum.GetSeconds() / i->second.rxPackets << " ms\n";
-        }
-        else
-        {
-            // outFile << "  Throughput:  0 Mbps\n";
-            // outFile << "  Mean delay:  0 ms\n";
-            // outFile << "  Mean jitter: 0 ms\n";
-        }
-        // outFile << "  Rx Packets: " << i->second.rxPackets << "\n";
-    }
-    std::sort(delayValues, delayValues + stats.size());
-    // for (uint32_t i = 0; i < stats.size(); i++)
-    //   {
-    //     std::cout << delayValues[i] << " ";
-    //   }
-    // double FiftyTileFlowDelay = (delayValues[stats.size()/2] + delayValues[stats.size()/2 -1])/2;
-    double FiftyTileFlowDelay = delayValues[stats.size() / 2];
-
-    outFile << "\n\n  Mean flow throughput: " << averageFlowThroughput / stats.size() << "\n";
-    outFile << "  Mean flow delay: " << averageFlowDelay / stats.size() << "\n";
-    outFile << "  Median flow delay: " << FiftyTileFlowDelay << "\n";
-
-    outFile.close();
-
-    std::ifstream f(filename.c_str());
-
-    if (f.is_open())
-    {
-        std::cout << f.rdbuf();
-    }
+    // Print per-flow statistics
+    std::cout << "I've been called! \n ";
 
     Simulator::Destroy();
     return 0;
