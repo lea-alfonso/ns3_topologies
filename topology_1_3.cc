@@ -36,6 +36,24 @@ using namespace ns3;
  * $ export NS_LOG="CttcTrafficExample=level_info|prefix_func|prefix_time"
  */
 NS_LOG_COMPONENT_DEFINE("CttcNrTrafficNgmnMixed");
+struct TrackedStats {
+    double throughputThreshold; // Threshold for throughput
+    double meanDelayThreshold; // Threshold for mean delay
+    double lastPacketDelayThreshold; // Threshold for last packet delay
+    double meanJitterThreshold; // Threshold for mean jitter
+
+    // Constructor to initialize the thresholds
+    TrackedStats(double throughput, double meanDelay, double lastPacketDelay, double meanJitter)
+        : throughputThreshold(throughput),
+          meanDelayThreshold(meanDelay),
+          lastPacketDelayThreshold(lastPacketDelay),
+          meanJitterThreshold(meanJitter) {}
+};
+TrackedStats thresholds(100.0, 10.0, 5.0, 2.0); // Example threshold values
+
+TrackedStats lastMeasurment(100.0, 10.0, 5.0, 2.0); // Example last measurment
+
+
 
 
 class RadioNetworkParametersHelper
