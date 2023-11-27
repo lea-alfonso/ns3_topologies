@@ -12,8 +12,6 @@ set(base_examples
     cttc-nr-cc-bwp-demo
     cttc-lte-ca-demo
     cttc-nr-demo
-    topologia_1
-    topologia_1o
     topology_1_3
     cttc-error-model
     cttc-error-model-amc
