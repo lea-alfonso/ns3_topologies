@@ -12,7 +12,6 @@ set(base_examples
     cttc-nr-cc-bwp-demo
     cttc-lte-ca-demo
     cttc-nr-demo
-    topology_1_3
     cttc-error-model
     cttc-error-model-amc
     cttc-error-model-comparison
@@ -25,6 +24,8 @@ set(base_examples
     cttc-nr-traffic-ngmn-mixed
     cttc-nr-traffic-3gpp-xr
     traffic-generator-example
+    topology_1_3
+    second_nr
 )
 foreach(
   example

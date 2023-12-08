@@ -36,6 +36,7 @@ using namespace ns3;
  * $ export NS_LOG="CttcTrafficExample=level_info|prefix_func|prefix_time"
  */
 NS_LOG_COMPONENT_DEFINE("CttcNrTrafficNgmnMixed");
+
 struct TrackedStats {
     double throughputThreshold; // Threshold for throughput
     double meanDelayThreshold; // Threshold for mean delay
