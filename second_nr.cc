@@ -41,6 +41,31 @@ Time lastPacketReceiptTime = Seconds(0);
 
 static void test(std::string context, Ptr<const Packet> packet, Ptr<NetDevice> sender, Ptr<NetDevice> receiver, Time start, Time end) {
     std::cout << "(" << sender->GetAddress() << " -> " << receiver->GetAddress() << ") start: " << start << " end: " << end << " lastPacketReceiptTime: " << lastPacketReceiptTime << "\n" ;
+
+    Ipv4Address senderAddress;
+    Ipv4Address receiverAddress;
+
+    Ptr<Ipv4> ipv4src = sender->GetNode()->GetObject<Ipv4>();
+    Ptr<Ipv4> ipv4dest = receiver->GetNode()->GetObject<Ipv4>();
+
+    for (uint32_t i = 0; i < ipv4src->GetNInterfaces(); i++) {
+        if (ipv4src->GetAddress(i, 0).GetLocal() == sender->GetNode()->GetObject<Ipv4>()->GetAddress(1, 0).GetLocal()) {
+            senderAddress = ipv4src->GetAddress(i, 0).GetLocal();
+            break;
+        }
+    }
+
+    for (uint32_t i = 0; i < ipv4dest->GetNInterfaces(); i++) {
+        if (ipv4dest->GetAddress(i, 0).GetLocal() == receiver->GetNode()->GetObject<Ipv4>()->GetAddress(1, 0).GetLocal()) {
+            receiverAddress = ipv4dest->GetAddress(i, 0).GetLocal();
+            break;
+        }
+    }
+
+
+    std::cout << "(" << senderAddress << " -> " << receiverAddress << ") start: " << start << " end: " << end << " lastPacketReceiptTime: " << lastPacketReceiptTime << "\n";
+
+
     // Calculate throughput (in Mbps)
     double throughput = (packet->GetSize() * 8.0) / (end.GetSeconds() - start.GetSeconds()) / 1e6;
 
@@ -99,7 +124,7 @@ int main(int argc, char* argv[]) {
     csmaDevices = csma.Install(csmaNodes);
     std::ostringstream oss;
     oss << "/ChannelList/"
-        << "*"
+        << p2pDevices.Get(0)->GetChannel()
         << "/$ns3::PointToPointChannel/TxRxPointToPoint";
 
     Config::Connect(oss.str(), MakeCallback(&test));
