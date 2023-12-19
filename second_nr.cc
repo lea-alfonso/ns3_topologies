@@ -37,10 +37,10 @@ using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE("SecondScriptExample");
 
-Time lastPacketReceiptTime = Seconds(0);
+std::map<uint32_t, Time> lastPacketReceiptTimes;
 
 static void test(std::string context, Ptr<const Packet> packet, Ptr<NetDevice> sender, Ptr<NetDevice> receiver, Time start, Time end) {
-    std::cout << "(" << sender->GetAddress() << " -> " << receiver->GetAddress() << ") start: " << start << " end: " << end << " lastPacketReceiptTime: " << lastPacketReceiptTime << "\n" ;
+    std::cout << "(" << sender->GetAddress() << " -> " << receiver->GetAddress() << ") start: " << start << " end: " << end  << "\n" ;
 
     Ipv4Address senderAddress;
     Ipv4Address receiverAddress;
@@ -63,9 +63,13 @@ static void test(std::string context, Ptr<const Packet> packet, Ptr<NetDevice> s
     }
 
 
-    std::cout << "(" << senderAddress << " -> " << receiverAddress << ") start: " << start << " end: " << end << " lastPacketReceiptTime: " << lastPacketReceiptTime << "\n";
+    std::cout << "(" << senderAddress << " -> " << receiverAddress << ") start: " << start << " end: " << end << "\n";
 
-
+    // Check if the entry exists in the map
+    if (lastPacketReceiptTimes.find(receiver->GetNode()->GetId()) == lastPacketReceiptTimes.end()) {
+        // If not, initialize it to the current end time
+        lastPacketReceiptTimes[receiver->GetNode()->GetId()] = end;
+    }
     // Calculate throughput (in Mbps)
     double throughput = (packet->GetSize() * 8.0) / (end.GetSeconds() - start.GetSeconds()) / 1e6;
 
@@ -73,10 +77,10 @@ static void test(std::string context, Ptr<const Packet> packet, Ptr<NetDevice> s
     double delay = (end - start).GetMilliSeconds();
 
     // Calculate jitter (difference in packet receipt time)
-    double jitter = (end - lastPacketReceiptTime).GetMilliSeconds();
+    double jitter = (end - lastPacketReceiptTimes[receiver->GetNode()->GetId()]).GetMilliSeconds();
 
     // Update lastPacketReceiptTime for the next packet
-    lastPacketReceiptTime = end;
+    lastPacketReceiptTimes[receiver->GetNode()->GetId()] = end;
 
     // Print or store the calculated metrics
     std::cout << "Throughput: " << throughput << " Mbps, Delay: " << delay << " ms, Jitter: " << jitter << " ms\n";
