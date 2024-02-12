@@ -668,10 +668,6 @@ operator>>(std::istream& is, TrafficTypeConf& item)
     item = (TrafficTypeConf)inputValue;
     return is;
 }
-void handler(int arg0, int arg1)
-{
-std::cout << "handler called with argument arg0=" << arg0 << " and arg1=" << arg1 << std::endl;
-}
 
 void reportFlowStats(Ptr<FlowMonitor> monitor,Ptr<Ipv4FlowClassifier> classifier,std::string filename , std::ofstream& outFile){
     std::cout << "I've been called inside! \n ";
@@ -1976,7 +1972,6 @@ main(int argc, char* argv[])
         DynamicCast<Ipv4FlowClassifier>(flowmonHelper.GetClassifier());
     std::ofstream outFile;
     Simulator::Schedule(MilliSeconds(500),&reportFlowStats,monitor,classifier,filename,std::ref(outFile));
-    // Simulator::Schedule(Seconds (0), &handler, 10, 5);
     Simulator::Run();
 
     // Print per-flow statistics
