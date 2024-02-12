@@ -37,22 +37,24 @@ using namespace ns3;
  */
 NS_LOG_COMPONENT_DEFINE("CttcNrTrafficNgmnMixed");
 
+
 struct TrackedStats {
-    double throughputThreshold; // Threshold for throughput
-    double meanDelayThreshold; // Threshold for mean delay
-    double lastPacketDelayThreshold; // Threshold for last packet delay
-    double meanJitterThreshold; // Threshold for mean jitter
+    ns3::Time throughput; // Threshold for throughput
+    ns3::Time meanDelay; // Threshold for mean delay
+    ns3::Time lastPacketDelay; // Threshold for last packet delay
+    ns3::Time meanJitter; // Threshold for mean jitter
 
     // Constructor to initialize the thresholds
-    TrackedStats(double throughput, double meanDelay, double lastPacketDelay, double meanJitter)
-        : throughputThreshold(throughput),
-          meanDelayThreshold(meanDelay),
-          lastPacketDelayThreshold(lastPacketDelay),
-          meanJitterThreshold(meanJitter) {}
+    TrackedStats(ns3::Time throughput, ns3::Time meanDelay, ns3::Time lastPacketDelay, ns3::Time meanJitter)
+        : throughput(throughput),
+          meanDelay(meanDelay),
+          lastPacketDelay(lastPacketDelay),
+          meanJitter(meanJitter) {}
 };
-TrackedStats thresholds(100.0, 10.0, 5.0, 2.0); // Example threshold values
 
-TrackedStats lastMeasurment(100.0, 10.0, 5.0, 2.0); // Example last measurment
+// TrackedStats thresholds(100.0, 10.0, 5.0, 2.0); // Example threshold values
+
+//TrackedStats lastMeasurment(100.0, 10.0, 5.0, 2.0); // Example last measurment
 
 
 
@@ -674,6 +676,15 @@ std::cout << "handler called with argument arg0=" << arg0 << " and arg1=" << arg
 }
 
 void reportFlowStats(Ptr<FlowMonitor> monitor,Ptr<Ipv4FlowClassifier> classifier,std::string filename , std::ofstream& outFile){
+
+    //throughput*, meanDelay, lastPacketDelay*, meanJitter* 
+    //TrackedStats variableName(double throughput, double meanDelay, double lastPacketDelay, double meanJitter);
+    TrackedStats measurements(Seconds(0), Seconds(0), Seconds(0), Seconds(0));
+    TrackedStats thresholds(Seconds(0), Seconds(0), Seconds(0), Seconds(0));
+
+    ns3::Time NETWORK_OK_MEASURING_TIME = MilliSeconds(50);
+    ns3::Time NETWORK_NOT_OK_MEASURING_TIME = MilliSeconds(25);
+
     std::cout << "I've been called inside! \n ";
     
     FlowMonitor::FlowStatsContainer stats = monitor->GetFlowStats();
@@ -732,16 +743,53 @@ void reportFlowStats(Ptr<FlowMonitor> monitor,Ptr<Ipv4FlowClassifier> classifier
             delayValues[cont] = 1000 * i->second.delaySum.GetSeconds() / i->second.rxPackets;
             cont++;
 
-            std::cout << "  Throughput: " << i->second.rxBytes * 8.0 / rxDuration / 1000 / 1000
+	    //measurements.throughput = i->second.rxBytes * 8.0 / rxDuration / 1000 / 1000;
+        measurements.throughput = Time(Seconds(i->second.rxBytes * 8.0 / rxDuration / 1000 / 1000));
+
+	    //measurements.meanDelay = double(1000 * i->second.delaySum.GetSeconds()) / (i->second.rxPackets);
+        measurements.meanDelay = MilliSeconds(double(1000 * i->second.delaySum.GetSeconds()) / i->second.rxPackets);
+
+	    //measurements.lastPacketDelay = i->second.lastDelay.As(Time::MS);
+        measurements.lastPacketDelay = MilliSeconds(i->second.lastDelay.GetMilliSeconds());
+
+	    //measurements.meanJitter = 1000 * i->second.jitterSum.GetSeconds() / i->second.rxPackets;
+        measurements.meanJitter = MilliSeconds(1000 * i->second.jitterSum.GetSeconds() / i->second.rxPackets);
+
+
+            std::cout << "  Throughput_Old: " << i->second.rxBytes * 8.0 / rxDuration / 1000 / 1000
                       << " Mbps\n";
-            std::cout << "  Mean delay:  "
-                      << double(1000 * i->second.delaySum.GetSeconds()) / (i->second.rxPackets)
+
+            std::cout << "  Throughput_New: " << measurements.throughput
+                      << " Mbps\n";
+
+            std::cout << "  Mean delay_Old:  "
+                      << double(1000 * i->second.delaySum.GetSeconds()) / (i->second.rxPackets) 
                       << " ms\n";
-            std::cout << "  Last packet delay: " << i->second.lastDelay.As(Time::MS) << "\n";
+
+            std::cout << "  Mean delay_New:  "
+                      << measurements.meanDelay 
+                      << " ms\n";
+
+            std::cout << "  Last packet delay_Old: " << MilliSeconds(i->second.lastDelay.GetMilliSeconds()) << " ms\n";
+            std::cout << "  Last packet delay_New: " << measurements.lastPacketDelay << " ms\n";
+
             // std::cout << "  Mean upt:  " << i->second.uptSum / i->second.rxPackets / 1000/1000 <<
             // " Mbps \n";
-            std::cout << "  Mean jitter:  "
+
+            std::cout << "  Mean jitter_Old:  "
                       << 1000 * i->second.jitterSum.GetSeconds() / i->second.rxPackets << " ms\n";
+
+            std::cout << "  Mean jitter_New:  "
+                      << measurements.meanJitter << " ms\n";
+
+	    std::cout << "\n";
+	    std::cout << "Measurements :" << "\n";
+	    std::cout << "Measurements_Throughput : " << measurements.throughput << " Mbps\n";
+	    std::cout << "Measurements_MeanDelay : " << measurements.meanDelay << " ms\n";
+	    std::cout << "Measurements_LastPacketDelay : " << measurements.lastPacketDelay << " ms\n";
+	    std::cout << "Measurements_MeanJitter : " << measurements.meanJitter << " ms\n";
+	    std::cout << "\n";
+
         }
         else
         {
@@ -771,7 +819,21 @@ void reportFlowStats(Ptr<FlowMonitor> monitor,Ptr<Ipv4FlowClassifier> classifier
     {
         std::cout << f.rdbuf();
     }
-    Simulator::Schedule(MilliSeconds(50),&reportFlowStats,monitor,classifier,filename,std::ref(outFile));
+
+    ns3::Time MEASURING_TIME; 
+    if(
+        measurements.throughput > thresholds.throughput || 
+        measurements.meanDelay > thresholds.meanDelay || 
+        measurements.lastPacketDelay > thresholds.lastPacketDelay || 
+        measurements.meanJitter > thresholds.meanJitter
+    ){
+        MEASURING_TIME = NETWORK_NOT_OK_MEASURING_TIME;
+    } 
+    else{
+
+        MEASURING_TIME = NETWORK_OK_MEASURING_TIME;
+    }
+    Simulator::Schedule(MEASURING_TIME, &reportFlowStats, monitor, classifier, filename, std::ref(outFile));
 }
 
 int
