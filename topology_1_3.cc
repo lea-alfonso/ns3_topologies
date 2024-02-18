@@ -22,8 +22,7 @@
 #include <ns3/traffic-generator-ngmn-gaming.h>
 #include <ns3/traffic-generator-ngmn-video.h>
 #include <ns3/traffic-generator-ngmn-voip.h>
-#include <ns3/v4ping-helper.h>
-
+#include <ns3/ping-helper.h>
 #include <algorithm>
 #include <iostream>
 
@@ -440,7 +439,7 @@ Set5gLenaSimulatorParameters(HexagonalGridScenarioHelper gridScenario,
             // Change the antenna orientation
             Ptr<NrGnbPhy> phy = nrHelper->GetGnbPhy(gnb, 0);
             Ptr<UniformPlanarArray> antenna =
-                DynamicCast<UniformPlanarArray>(phy->GetSpectrumPhy(0)->GetAntenna());
+                DynamicCast<UniformPlanarArray>(phy->GetSpectrumPhy()->GetAntenna());
             antenna->SetAttribute("BearingAngle", DoubleValue(orientationRads));
             // Set TDD pattern
             nrHelper->GetGnbPhy(gnb, 0)->SetAttribute("Pattern",
@@ -452,11 +451,11 @@ Set5gLenaSimulatorParameters(HexagonalGridScenarioHelper gridScenario,
             // Change the antenna orientation
             Ptr<NrGnbPhy> phy0 = nrHelper->GetGnbPhy(gnb, 0);
             Ptr<UniformPlanarArray> antenna0 =
-                DynamicCast<UniformPlanarArray>(phy0->GetSpectrumPhy(0)->GetAntenna());
+                DynamicCast<UniformPlanarArray>(phy0->GetSpectrumPhy()->GetAntenna());
             antenna0->SetAttribute("BearingAngle", DoubleValue(orientationRads));
             Ptr<NrGnbPhy> phy1 = nrHelper->GetGnbPhy(gnb, 1);
             Ptr<UniformPlanarArray> antenna1 =
-                DynamicCast<UniformPlanarArray>(phy1->GetSpectrumPhy(0)->GetAntenna());
+                DynamicCast<UniformPlanarArray>(phy1->GetSpectrumPhy()->GetAntenna());
             antenna1->SetAttribute("BearingAngle", DoubleValue(orientationRads));
             // Set TDD pattern
             nrHelper->GetGnbPhy(gnb, 0)->SetAttribute(
@@ -487,7 +486,7 @@ Set5gLenaSimulatorParameters(HexagonalGridScenarioHelper gridScenario,
             // Change the antenna orientation
             Ptr<NrGnbPhy> phy = nrHelper->GetGnbPhy(gnb, 0);
             Ptr<UniformPlanarArray> antenna =
-                DynamicCast<UniformPlanarArray>(phy->GetSpectrumPhy(0)->GetAntenna());
+                DynamicCast<UniformPlanarArray>(phy->GetSpectrumPhy()->GetAntenna());
             antenna->SetAttribute("BearingAngle", DoubleValue(orientationRads));
             // Set TDD pattern
             nrHelper->GetGnbPhy(gnb, 0)->SetAttribute("Pattern",
@@ -499,11 +498,11 @@ Set5gLenaSimulatorParameters(HexagonalGridScenarioHelper gridScenario,
             // Change the antenna orientation
             Ptr<NrGnbPhy> phy0 = nrHelper->GetGnbPhy(gnb, 0);
             Ptr<UniformPlanarArray> antenna0 =
-                DynamicCast<UniformPlanarArray>(phy0->GetSpectrumPhy(0)->GetAntenna());
+                DynamicCast<UniformPlanarArray>(phy0->GetSpectrumPhy()->GetAntenna());
             antenna0->SetAttribute("BearingAngle", DoubleValue(orientationRads));
             Ptr<NrGnbPhy> phy1 = nrHelper->GetGnbPhy(gnb, 1);
             Ptr<UniformPlanarArray> antenna1 =
-                DynamicCast<UniformPlanarArray>(phy1->GetSpectrumPhy(0)->GetAntenna());
+                DynamicCast<UniformPlanarArray>(phy1->GetSpectrumPhy()->GetAntenna());
             antenna1->SetAttribute("BearingAngle", DoubleValue(orientationRads));
             // Set TDD pattern
             nrHelper->GetGnbPhy(gnb, 0)->SetAttribute(
@@ -533,7 +532,7 @@ Set5gLenaSimulatorParameters(HexagonalGridScenarioHelper gridScenario,
             // Change the antenna orientation
             Ptr<NrGnbPhy> phy = nrHelper->GetGnbPhy(gnb, 0);
             Ptr<UniformPlanarArray> antenna =
-                DynamicCast<UniformPlanarArray>(phy->GetSpectrumPhy(0)->GetAntenna());
+                DynamicCast<UniformPlanarArray>(phy->GetSpectrumPhy()->GetAntenna());
             antenna->SetAttribute("BearingAngle", DoubleValue(orientationRads));
             // Set TDD pattern
             nrHelper->GetGnbPhy(gnb, 0)->SetAttribute("Pattern",
@@ -545,11 +544,11 @@ Set5gLenaSimulatorParameters(HexagonalGridScenarioHelper gridScenario,
             // Change the antenna orientation
             Ptr<NrGnbPhy> phy0 = nrHelper->GetGnbPhy(gnb, 0);
             Ptr<UniformPlanarArray> antenna0 =
-                DynamicCast<UniformPlanarArray>(phy0->GetSpectrumPhy(0)->GetAntenna());
+                DynamicCast<UniformPlanarArray>(phy0->GetSpectrumPhy()->GetAntenna());
             antenna0->SetAttribute("BearingAngle", DoubleValue(orientationRads));
             Ptr<NrGnbPhy> phy1 = nrHelper->GetGnbPhy(gnb, 1);
             Ptr<UniformPlanarArray> antenna1 =
-                DynamicCast<UniformPlanarArray>(phy1->GetSpectrumPhy(0)->GetAntenna());
+                DynamicCast<UniformPlanarArray>(phy1->GetSpectrumPhy()->GetAntenna());
             antenna1->SetAttribute("BearingAngle", DoubleValue(orientationRads));
             // Set TDD pattern
             nrHelper->GetGnbPhy(gnb, 0)->SetAttribute(
@@ -840,6 +839,8 @@ void reportFlowStats(Ptr<FlowMonitor> monitor,Ptr<Ipv4FlowClassifier> classifier
 
         MEASURING_TIME = NETWORK_OK_MEASURING_TIME;
     }
+    // FlowMonitor::ResetAllStats()
+    monitor->ResetAllStats();
     Simulator::Schedule(MEASURING_TIME, &reportFlowStats, monitor, classifier, filename, std::ref(outFile));
 }
 
@@ -1109,6 +1110,8 @@ main(int argc, char* argv[])
     internet.Install(remoteHostContainer);
 
     // connect a remoteHost to pgw. Setup routing too
+    
+    //TODO: Add complexity here, we can create the arch we want. Add redundency
     PointToPointHelper p2ph;
     p2ph.SetDeviceAttribute("DataRate", DataRateValue(DataRate("100Gb/s")));
     p2ph.SetDeviceAttribute("Mtu", UintegerValue(2500));
@@ -1432,7 +1435,7 @@ main(int argc, char* argv[])
                 clientApps.Add(ftpHelper.Install(remoteHostContainer));
                 // Seed the ARP cache by pinging early in the simulation
                 // This is a workaround until a static ARP capability is provided
-                V4PingHelper ping(ipAddress);
+                PingHelper ping(ipAddress);
                 pingApps.Add(ping.Install(remoteHostContainer));
                 pingApps.Add(ping.Install(remoteHostContainer));
             }
@@ -1451,7 +1454,7 @@ main(int argc, char* argv[])
                 clientApps.Add(ftpHelper.Install(remoteHostContainer));
                 // Seed the ARP cache by pinging early in the simulation
                 // This is a workaround until a static ARP capability is provided
-                V4PingHelper ping(ipAddress);
+                PingHelper ping(ipAddress);
                 pingApps.Add(ping.Install(remoteHostContainer));
             }
             // configure clients on sector 3
@@ -1470,7 +1473,7 @@ main(int argc, char* argv[])
                 clientApps.Add(ftpHelper.Install(remoteHostContainer));
                 // Seed the ARP cache by pinging early in the simulation
                 // This is a workaround until a static ARP capability is provided
-                V4PingHelper ping(ipAddress);
+                PingHelper ping(ipAddress);
                 pingApps.Add(ping.Install(remoteHostContainer));
             }
 
@@ -1530,7 +1533,7 @@ main(int argc, char* argv[])
                 clientApps.Add(trafficGeneratorHelper.Install(remoteHostContainer));
                 // Seed the ARP cache by pinging early in the simulation
                 // This is a workaround until a static ARP capability is provided
-                V4PingHelper ping(ipAddress);
+                PingHelper ping(ipAddress);
                 pingApps.Add(ping.Install(remoteHostContainer));
             }
             // configure clients on sector 2
@@ -1550,7 +1553,7 @@ main(int argc, char* argv[])
                 clientApps.Add(trafficGeneratorHelper.Install(remoteHostContainer));
                 // Seed the ARP cache by pinging early in the simulation
                 // This is a workaround until a static ARP capability is provided
-                V4PingHelper ping(ipAddress);
+                PingHelper ping(ipAddress);
                 pingApps.Add(ping.Install(remoteHostContainer));
             }
             // configure clients on sector 3
@@ -1570,7 +1573,7 @@ main(int argc, char* argv[])
                 clientApps.Add(trafficGeneratorHelper.Install(remoteHostContainer));
                 // Seed the ARP cache by pinging early in the simulation
                 // This is a workaround until a static ARP capability is provided
-                V4PingHelper ping(ipAddress);
+                PingHelper ping(ipAddress);
                 pingApps.Add(ping.Install(remoteHostContainer));
             }
 
@@ -1644,7 +1647,7 @@ main(int argc, char* argv[])
                 clientApps.Add(trafficGeneratorHelper.Install(remoteHostContainer));
                 // Seed the ARP cache by pinging early in the simulation
                 // This is a workaround until a static ARP capability is provided
-                V4PingHelper ping(ipAddress);
+                PingHelper ping(ipAddress);
                 pingApps.Add(ping.Install(remoteHostContainer));
             }
             // configure clients on sector 2
@@ -1664,7 +1667,7 @@ main(int argc, char* argv[])
                 clientApps.Add(trafficGeneratorHelper.Install(remoteHostContainer));
                 // Seed the ARP cache by pinging early in the simulation
                 // This is a workaround until a static ARP capability is provided
-                V4PingHelper ping(ipAddress);
+                PingHelper ping(ipAddress);
                 pingApps.Add(ping.Install(remoteHostContainer));
             }
             // configure clients on sector 3
@@ -1684,7 +1687,7 @@ main(int argc, char* argv[])
                 clientApps.Add(trafficGeneratorHelper.Install(remoteHostContainer));
                 // Seed the ARP cache by pinging early in the simulation
                 // This is a workaround until a static ARP capability is provided
-                V4PingHelper ping(ipAddress);
+                PingHelper ping(ipAddress);
                 pingApps.Add(ping.Install(remoteHostContainer));
             }
 
@@ -1758,7 +1761,7 @@ main(int argc, char* argv[])
                 clientApps.Add(trafficGeneratorHelper.Install(remoteHostContainer));
                 // Seed the ARP cache by pinging early in the simulation
                 // This is a workaround until a static ARP capability is provided
-                V4PingHelper ping(ipAddress);
+                PingHelper ping(ipAddress);
                 pingApps.Add(ping.Install(remoteHostContainer));
             }
             // configure clients on sector 2
@@ -1777,7 +1780,7 @@ main(int argc, char* argv[])
                 clientApps.Add(trafficGeneratorHelper.Install(remoteHostContainer));
                 // Seed the ARP cache by pinging early in the simulation
                 // This is a workaround until a static ARP capability is provided
-                V4PingHelper ping(ipAddress);
+                PingHelper ping(ipAddress);
                 pingApps.Add(ping.Install(remoteHostContainer));
             }
             // configure clients on sector 3
@@ -1796,7 +1799,7 @@ main(int argc, char* argv[])
                 clientApps.Add(trafficGeneratorHelper.Install(remoteHostContainer));
                 // Seed the ARP cache by pinging early in the simulation
                 // This is a workaround until a static ARP capability is provided
-                V4PingHelper ping(ipAddress);
+                PingHelper ping(ipAddress);
                 pingApps.Add(ping.Install(remoteHostContainer));
             }
 
@@ -1892,7 +1895,7 @@ main(int argc, char* argv[])
             }
 
             Ipv4Address ipAddress = ueSector1IpIface.GetAddress(i, 0);
-            V4PingHelper ping(ipAddress);
+            PingHelper ping(ipAddress);
             pingApps.Add(ping.Install(remoteHostContainer));
         }
         // configure clients on sector 2
@@ -1906,8 +1909,6 @@ main(int argc, char* argv[])
             }
 
             Ipv4Address ipAddress = ueSector2IpIface.GetAddress(i, 0);
-            V4PingHelper ping(ipAddress);
-            pingApps.Add(ping.Install(remoteHostContainer));
         }
         // configure clients on sector 3
         for (uint32_t i = 0; i < ueSector3IpIface.GetN(); i++)
@@ -1920,7 +1921,7 @@ main(int argc, char* argv[])
             }
 
             Ipv4Address ipAddress = ueSector3IpIface.GetAddress(i, 0);
-            V4PingHelper ping(ipAddress);
+            PingHelper ping(ipAddress);
             pingApps.Add(ping.Install(remoteHostContainer));
         }
     }

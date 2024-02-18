@@ -1,51 +1,30 @@
 /* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
 
-// Copyright (c) 2019 Centre Tecnologic de Telecomunicacions de Catalunya (CTTC)
+// Copyright (c) 2022 Centre Tecnologic de Telecomunicacions de Catalunya (CTTC)
 //
 // SPDX-License-Identifier: GPL-2.0-only
 
 /**
  * \ingroup examples
- * \file cttc-nr-demo.cc
- * \brief A cozy, simple, NR demo (in a tutorial style)
+ * \file cttc-nr-simple-qos-sched.cc
+ * \brief A simple example for QoS scheduler (nr-mac-scheduler-ofdma/tdma-qos)
  *
- * Notice: this entire program uses technical terms defined by the 3GPP TS 38.300 [1].
+ * This example describes how to setup a simulation using the QoS scheduler and
+ * the 3GPP channel model from TR 38.900. This example consists of a simple
+ * topology, in which there is only one gNB and two UEs with different QCI flows.
+ * Have a look at the possible parameters to know what you can configure through
+ * the command line.
  *
- * This example describes how to setup a simulation using the 3GPP channel model from TR 38.901 [2].
- * This example consists of a simple grid topology, in which you
- * can choose the number of gNbs and UEs. Have a look at the possible parameters
- * to know what you can configure through the command line.
- *
- * With the default configuration, the example will create two flows that will
- * go through two different subband numerologies (or bandwidth parts). For that,
- * specifically, two bands are created, each with a single CC, and each CC containing
- * one bandwidth part.
+ * With the default configuration, the example will create one flow for each UE,
+ * with different QCIs that will go through the same BWP.
  *
  * The example will print on-screen the end-to-end result of one (or two) flows,
  * as well as writing them on a file.
  *
  * \code{.unparsed}
-$ ./ns3 run "cttc-nr-demo --PrintHelp"
+$ ./ns3 run "cttc-nr-simple-qos-sched --PrintHelp"
     \endcode
  *
- */
-
-// NOLINTBEGIN
-// clang-format off
-
-/**
- * Useful references that will be used for this tutorial:
- * [1] <a href="https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3191">3GPP TS 38.300</a>
- * [2] <a href="https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3173">3GPP channel model from TR 38.901</a>
- * [3] <a href="https://www.nsnam.org/docs/release/3.38/tutorial/html/tweaking.html#using-the-logging-module">ns-3 documentation</a>
- */
-
-// clang-format on
-// NOLINTEND
-
-/*
- * Include part. Often, you will have to include the headers for an entire module;
- * do that by including the name of the module you need with the suffix "-module.h".
  */
 
 #include "ns3/antenna-module.h"
@@ -61,17 +40,9 @@ $ ./ns3 run "cttc-nr-demo --PrintHelp"
 #include "ns3/nr-module.h"
 #include "ns3/point-to-point-module.h"
 
-/*
- * Use, always, the namespace ns3. All the NR classes are inside such namespace.
- */
 using namespace ns3;
 
-/*
- * With this line, we will be able to see the logs of the file by enabling the
- * component "CttcNrDemo".
- * Further information on how logging works can be found in the ns-3 documentation [3].
- */
-NS_LOG_COMPONENT_DEFINE("CttcNrDemo");
+NS_LOG_COMPONENT_DEFINE("CttcNrSimpleQosSched");
 
 int
 main(int argc, char* argv[])
@@ -85,31 +56,24 @@ main(int argc, char* argv[])
     uint16_t gNbNum = 1;
     uint16_t ueNumPergNb = 2;
     bool logging = false;
-    bool doubleOperationalBand = true;
-
-    // Traffic parameters (that we will use inside this script):
-    uint32_t udpPacketSizeULL = 100;
-    uint32_t udpPacketSizeBe = 1252;
-    uint32_t lambdaULL = 10000;
-    uint32_t lambdaBe = 10000;
 
     // Simulation parameters. Please don't use double to indicate seconds; use
     // ns-3 Time values which use integers to avoid portability issues.
     Time simTime = MilliSeconds(1000);
     Time udpAppStartTime = MilliSeconds(400);
 
-    // NR parameters (Reference: 3GPP TR 38.901 V17.0.0 (Release 17)
-    // Table 7.8-1 for the power and BW).
-    // In this example the BW has been split into two BWPs
-    // We will take the input from the command line, and then we
+    // NR parameters. We will take the input from the command line, and then we
     // will pass them inside the NR module.
-    uint16_t numerologyBwp1 = 4;
-    double centralFrequencyBand1 = 28e9;
-    double bandwidthBand1 = 50e6;
-    uint16_t numerologyBwp2 = 2;
-    double centralFrequencyBand2 = 28.2e9;
-    double bandwidthBand2 = 50e6;
-    double totalTxPower = 35;
+    uint16_t numerology = 0;
+    double centralFrequency = 4e9;
+    double bandwidth = 5e6;
+    double totalTxPower = 43;
+
+    bool enableOfdma = false;
+
+    uint8_t priorityTrafficScenario = 0; // default is saturation
+
+    uint16_t mcsTable = 2;
 
     // Where we will store the output files.
     std::string simTag = "default";
@@ -120,38 +84,19 @@ main(int argc, char* argv[])
      * that we may accept as input, as well as their description, and the storage
      * variable.
      */
-    CommandLine cmd(__FILE__);
+    CommandLine cmd;
 
     cmd.AddValue("gNbNum", "The number of gNbs in multiple-ue topology", gNbNum);
     cmd.AddValue("ueNumPergNb", "The number of UE per gNb in multiple-ue topology", ueNumPergNb);
     cmd.AddValue("logging", "Enable logging", logging);
-    cmd.AddValue("doubleOperationalBand",
-                 "If true, simulate two operational bands with one CC for each band,"
-                 "and each CC will have 1 BWP that spans the entire CC.",
-                 doubleOperationalBand);
-    cmd.AddValue("packetSizeUll",
-                 "packet size in bytes to be used by ultra low latency traffic",
-                 udpPacketSizeULL);
-    cmd.AddValue("packetSizeBe",
-                 "packet size in bytes to be used by best effort traffic",
-                 udpPacketSizeBe);
-    cmd.AddValue("lambdaUll",
-                 "Number of UDP packets in one second for ultra low latency traffic",
-                 lambdaULL);
-    cmd.AddValue("lambdaBe",
-                 "Number of UDP packets in one second for best effor traffic",
-                 lambdaBe);
+    cmd.AddValue("priorityTrafficScenario",
+                 "The traffic scenario for the case of priority. Can be 0: saturation"
+                 "or 1: medium-load",
+                 priorityTrafficScenario);
     cmd.AddValue("simTime", "Simulation time", simTime);
-    cmd.AddValue("numerologyBwp1", "The numerology to be used in bandwidth part 1", numerologyBwp1);
-    cmd.AddValue("centralFrequencyBand1",
-                 "The system frequency to be used in band 1",
-                 centralFrequencyBand1);
-    cmd.AddValue("bandwidthBand1", "The system bandwidth to be used in band 1", bandwidthBand1);
-    cmd.AddValue("numerologyBwp2", "The numerology to be used in bandwidth part 2", numerologyBwp2);
-    cmd.AddValue("centralFrequencyBand2",
-                 "The system frequency to be used in band 2",
-                 centralFrequencyBand2);
-    cmd.AddValue("bandwidthBand2", "The system bandwidth to be used in band 2", bandwidthBand2);
+    cmd.AddValue("numerology", "The numerology to be used", numerology);
+    cmd.AddValue("centralFrequency", "The system frequency to be used", centralFrequency);
+    cmd.AddValue("bandwidth", "The system bandwidth to be used", bandwidth);
     cmd.AddValue("totalTxPower",
                  "total tx power that will be proportionally assigned to"
                  " bands, CCs and bandwidth parts depending on each BWP bandwidth ",
@@ -160,40 +105,21 @@ main(int argc, char* argv[])
                  "tag to be appended to output filenames to distinguish simulation campaigns",
                  simTag);
     cmd.AddValue("outputDir", "directory where to store simulation results", outputDir);
+    cmd.AddValue("enableOfdma",
+                 "If set to true it enables Ofdma scheduler. Default value is false (Tdma)",
+                 enableOfdma);
 
-    // Parse the command line
     cmd.Parse(argc, argv);
 
-    /*
-     * Check if the frequency is in the allowed range.
-     * If you need to add other checks, here is the best position to put them.
-     */
-    NS_ABORT_IF(centralFrequencyBand1 < 0.5e9 && centralFrequencyBand1 > 100e9);
-    NS_ABORT_IF(centralFrequencyBand2 < 0.5e9 && centralFrequencyBand2 > 100e9);
-
-    /*
-     * If the logging variable is set to true, enable the log of some components
-     * through the code. The same effect can be obtained through the use
-     * of the NS_LOG environment variable:
-     *
-     * export NS_LOG="UdpClient=level_info|prefix_time|prefix_func|prefix_node:UdpServer=..."
-     *
-     * Usually, the environment variable way is preferred, as it is more customizable,
-     * and more expressive.
-     */
+    // enable logging or not
     if (logging)
     {
-        LogComponentEnable("UdpClient", LOG_LEVEL_INFO);
-        LogComponentEnable("UdpServer", LOG_LEVEL_INFO);
-        LogComponentEnable("LtePdcp", LOG_LEVEL_INFO);
+        LogLevel logLevel1 =
+            (LogLevel)(LOG_PREFIX_FUNC | LOG_PREFIX_TIME | LOG_PREFIX_NODE | LOG_LEVEL_INFO);
+        LogComponentEnable("NrMacSchedulerNs3", logLevel1);
+        LogComponentEnable("NrMacSchedulerTdma", logLevel1);
     }
 
-    /*
-     * In general, attributes for the NR module are typically configured in NrHelper.  However, some
-     * attributes need to be configured globally through the Config::SetDefault() method. Below is
-     * an example: if you want to make the RLC buffer very large, you can pass a very large integer
-     * here.
-     */
     Config::SetDefault("ns3::LteRlcUm::MaxTxBufferSize", UintegerValue(999999999));
 
     /*
@@ -202,24 +128,43 @@ main(int argc, char* argv[])
      * GridScenarioHelper documentation to see how the nodes will be distributed.
      */
     int64_t randomStream = 1;
+
     GridScenarioHelper gridScenario;
     gridScenario.SetRows(1);
     gridScenario.SetColumns(gNbNum);
-    // All units below are in meters
-    gridScenario.SetHorizontalBsDistance(10.0);
-    gridScenario.SetVerticalBsDistance(10.0);
-    gridScenario.SetBsHeight(10);
+    gridScenario.SetHorizontalBsDistance(5.0);
+    gridScenario.SetVerticalBsDistance(5.0);
+    gridScenario.SetBsHeight(1.5);
     gridScenario.SetUtHeight(1.5);
     // must be set before BS number
     gridScenario.SetSectorization(GridScenarioHelper::SINGLE);
-    
-    //Set base stations
     gridScenario.SetBsNumber(gNbNum);
     gridScenario.SetUtNumber(ueNumPergNb * gNbNum);
     gridScenario.SetScenarioHeight(3); // Create a 3x3 scenario where the UE will
     gridScenario.SetScenarioLength(3); // be distributed.
     randomStream += gridScenario.AssignStreams(randomStream);
     gridScenario.CreateScenario();
+
+    uint32_t udpPacketSizeULL;
+    uint32_t udpPacketSizeBe;
+    uint32_t lambdaULL = 1000;
+    uint32_t lambdaBe = 1000;
+
+    if (priorityTrafficScenario == 0) // saturation
+    {
+        udpPacketSizeULL = 3000;
+        udpPacketSizeBe = 3000;
+    }
+    else if (priorityTrafficScenario == 1) // medium-load
+    {
+        udpPacketSizeULL = 3000;
+        udpPacketSizeBe = 1252;
+    }
+    else
+    {
+        NS_ABORT_MSG("The priorityTrafficScenario chosen is not correct. "
+                     "Please choose among 0: saturation and 1: medium-load");
+    }
 
     /*
      * Create two different NodeContainer for the different traffic type.
@@ -232,30 +177,17 @@ main(int argc, char* argv[])
     for (uint32_t j = 0; j < gridScenario.GetUserTerminals().GetN(); ++j)
     {
         Ptr<Node> ue = gridScenario.GetUserTerminals().Get(j);
-        if (j % 2 == 0)
-        {
-            ueLowLatContainer.Add(ue);
-        }
-        else
-        {
-            ueVoiceContainer.Add(ue);
-        }
+
+        j % 2 == 0 ? ueLowLatContainer.Add(ue) : ueVoiceContainer.Add(ue);
     }
 
-    /*
-     * TODO: Add a print, or a plot, that shows the scenario.
-     */
-    NS_LOG_INFO("Creating " << gridScenario.GetUserTerminals().GetN() << " user terminals and "
-                            << gridScenario.GetBaseStations().GetN() << " gNBs");
+    if (priorityTrafficScenario == 1)
+    {
+        lambdaULL = 1000 / ueLowLatContainer.GetN();
+        lambdaBe = 1000 / ueVoiceContainer.GetN();
+    }
 
-    /*
-     * Setup the NR module. We create the various helpers needed for the
-     * NR simulation:
-     * - EpcHelper, which will setup the core network
-     * - IdealBeamformingHelper, which takes care of the beamforming part
-     * - NrHelper, which takes care of creating and connecting the various
-     * part of the NR stack
-     */
+    // setup the nr simulation
     Ptr<NrPointToPointEpcHelper> epcHelper = CreateObject<NrPointToPointEpcHelper>();
     Ptr<IdealBeamformingHelper> idealBeamformingHelper = CreateObject<IdealBeamformingHelper>();
     Ptr<NrHelper> nrHelper = CreateObject<NrHelper>();
@@ -264,127 +196,84 @@ main(int argc, char* argv[])
     nrHelper->SetBeamformingHelper(idealBeamformingHelper);
     nrHelper->SetEpcHelper(epcHelper);
 
-    /*
-     * Spectrum division. We create two operational bands, each of them containing
-     * one component carrier, and each CC containing a single bandwidth part
-     * centered at the frequency specified by the input parameters.
-     * Each spectrum part length is, as well, specified by the input parameters.
-     * Both operational bands will use the StreetCanyon channel modeling.
-     */
-    BandwidthPartInfoPtrVector allBwps;
-    CcBwpCreator ccBwpCreator;
-    const uint8_t numCcPerBand = 1; // in this example, both bands have a single CC
-
-    // Create the configuration for the CcBwpHelper. SimpleOperationBandConf creates
-    // a single BWP per CC
-    CcBwpCreator::SimpleOperationBandConf bandConf1(centralFrequencyBand1,
-                                                    bandwidthBand1,
-                                                    numCcPerBand,
-                                                    BandwidthPartInfo::UMi_StreetCanyon);
-    CcBwpCreator::SimpleOperationBandConf bandConf2(centralFrequencyBand2,
-                                                    bandwidthBand2,
-                                                    numCcPerBand,
-                                                    BandwidthPartInfo::UMi_StreetCanyon);
-
-    // By using the configuration created, it is time to make the operation bands
-    OperationBandInfo band1 = ccBwpCreator.CreateOperationBandContiguousCc(bandConf1);
-    OperationBandInfo band2 = ccBwpCreator.CreateOperationBandContiguousCc(bandConf2);
-
-    /*
-     * The configured spectrum division is:
-     * ------------Band1--------------|--------------Band2-----------------
-     * ------------CC1----------------|--------------CC2-------------------
-     * ------------BWP1---------------|--------------BWP2------------------
-     */
-
-    /*
-     * Attributes of ThreeGppChannelModel still cannot be set in our way.
-     * TODO: Coordinate with Tommaso
-     */
+    nrHelper->SetPathlossAttribute("ShadowingEnabled", BooleanValue(false));
+    epcHelper->SetAttribute("S1uLinkDelay", TimeValue(MilliSeconds(0)));
     Config::SetDefault("ns3::ThreeGppChannelModel::UpdatePeriod", TimeValue(MilliSeconds(0)));
     nrHelper->SetChannelConditionModelAttribute("UpdatePeriod", TimeValue(MilliSeconds(0)));
-    nrHelper->SetPathlossAttribute("ShadowingEnabled", BooleanValue(false));
 
-    /*
-     * Initialize channel and pathloss, plus other things inside band1. If needed,
-     * the band configuration can be done manually, but we leave it for more
-     * sophisticated examples. For the moment, this method will take care
-     * of all the spectrum initialization needs.
-     */
-    nrHelper->InitializeOperationBand(&band1);
+    std::stringstream schedulerType;
+    std::string subType;
+    std::string sched;
 
-    /*
-     * Start to account for the bandwidth used by the example, as well as
-     * the total power that has to be divided among the BWPs.
-     */
-    double x = pow(10, totalTxPower / 10);
-    double totalBandwidth = bandwidthBand1;
+    subType = !enableOfdma ? "Tdma" : "Ofdma";
+    sched = "Qos";
+    schedulerType << "ns3::NrMacScheduler" << subType << sched;
+    std::cout << "SchedulerType: " << schedulerType.str() << std::endl;
+    nrHelper->SetSchedulerTypeId(TypeId::LookupByName(schedulerType.str()));
 
-    /*
-     * if not single band simulation, initialize and setup power in the second band
-     */
-    if (doubleOperationalBand)
-    {
-        // Initialize channel and pathloss, plus other things inside band2
-        nrHelper->InitializeOperationBand(&band2);
-        totalBandwidth += bandwidthBand2;
-        allBwps = CcBwpCreator::GetAllBwps({band1, band2});
-    }
-    else
-    {
-        allBwps = CcBwpCreator::GetAllBwps({band1});
-    }
+    // Error Model: gNB and UE with same spectrum error model.
+    std::string errorModel = "ns3::NrEesmIrT" + std::to_string(mcsTable);
+    nrHelper->SetDlErrorModel(errorModel);
+    nrHelper->SetUlErrorModel(errorModel);
 
-    /*
-     * allBwps contains all the spectrum configuration needed for the nrHelper.
-     *
-     * Now, we can setup the attributes. We can have three kind of attributes:
-     * (i) parameters that are valid for all the bandwidth parts and applies to
-     * all nodes, (ii) parameters that are valid for all the bandwidth parts
-     * and applies to some node only, and (iii) parameters that are different for
-     * every bandwidth parts. The approach is:
-     *
-     * - for (i): Configure the attribute through the helper, and then install;
-     * - for (ii): Configure the attribute through the helper, and then install
-     * for the first set of nodes. Then, change the attribute through the helper,
-     * and install again;
-     * - for (iii): Install, and then configure the attributes by retrieving
-     * the pointer needed, and calling "SetAttribute" on top of such pointer.
-     *
-     */
+    // Both DL and UL AMC will have the same model behind.
+    nrHelper->SetGnbDlAmcAttribute("AmcModel", EnumValue(NrAmc::ErrorModel));
+    nrHelper->SetGnbUlAmcAttribute("AmcModel", EnumValue(NrAmc::ErrorModel));
 
-    Packet::EnableChecking();
-    Packet::EnablePrinting();
-
-    /*
-     *  Case (i): Attributes valid for all the nodes
-     */
     // Beamforming method
     idealBeamformingHelper->SetAttribute("BeamformingMethod",
                                          TypeIdValue(DirectPathBeamforming::GetTypeId()));
 
-    // Core latency
-    epcHelper->SetAttribute("S1uLinkDelay", TimeValue(MilliSeconds(0)));
-
     // Antennas for all the UEs
-    nrHelper->SetUeAntennaAttribute("NumRows", UintegerValue(2));
-    nrHelper->SetUeAntennaAttribute("NumColumns", UintegerValue(4));
+    nrHelper->SetUeAntennaAttribute("NumRows", UintegerValue(1));
+    nrHelper->SetUeAntennaAttribute("NumColumns", UintegerValue(1));
     nrHelper->SetUeAntennaAttribute("AntennaElement",
                                     PointerValue(CreateObject<IsotropicAntennaModel>()));
 
     // Antennas for all the gNbs
-    nrHelper->SetGnbAntennaAttribute("NumRows", UintegerValue(4));
-    nrHelper->SetGnbAntennaAttribute("NumColumns", UintegerValue(8));
+    nrHelper->SetGnbAntennaAttribute("NumRows", UintegerValue(1));
+    nrHelper->SetGnbAntennaAttribute("NumColumns", UintegerValue(1));
     nrHelper->SetGnbAntennaAttribute("AntennaElement",
                                      PointerValue(CreateObject<IsotropicAntennaModel>()));
 
+    /*
+     * Setup the configuration of the spectrum. One operation band is deployed
+     * with 1 component carrier (CC), automatically generated by the ccBwpManager
+     */
+    BandwidthPartInfoPtrVector allBwps;
+    CcBwpCreator ccBwpCreator;
+    OperationBandInfo band;
+    const uint8_t numOfCcs = 1;
+
+    /*
+     * The configured spectrum division for TDD is:
+     *
+     * |----Band1----|
+     * |-----CC1-----|
+     * |-----BWP1----|
+     */
+
+    // Create the configuration for the CcBwpHelper. SimpleOperationBandConf creates
+    // a single BWP per CC
+    CcBwpCreator::SimpleOperationBandConf bandConf(centralFrequency,
+                                                   bandwidth,
+                                                   numOfCcs,
+                                                   BandwidthPartInfo::UMi_StreetCanyon);
+
+    bandConf.m_numBwp = 1;
+    // By using the configuration created, it is time to make the operation band
+    band = ccBwpCreator.CreateOperationBandContiguousCc(bandConf);
+
+    nrHelper->InitializeOperationBand(&band);
+    allBwps = CcBwpCreator::GetAllBwps({band});
+
+    double x = pow(10, totalTxPower / 10);
+
+    Packet::EnableChecking();
+    Packet::EnablePrinting();
+
     uint32_t bwpIdForLowLat = 0;
     uint32_t bwpIdForVoice = 0;
-    if (doubleOperationalBand)
-    {
-        bwpIdForVoice = 1;
-        bwpIdForLowLat = 0;
-    }
 
     // gNb routing between Bearer and bandwidh part
     nrHelper->SetGnbBwpManagerAlgorithmAttribute("NGBR_LOW_LAT_EMBB",
@@ -396,22 +285,9 @@ main(int argc, char* argv[])
     nrHelper->SetUeBwpManagerAlgorithmAttribute("GBR_CONV_VOICE", UintegerValue(bwpIdForVoice));
 
     /*
-     * We miss many other parameters. By default, not configuring them is equivalent
-     * to use the default values. Please, have a look at the documentation to see
-     * what are the default values for all the attributes you are not seeing here.
-     */
-
-    /*
-     * Case (ii): Attributes valid for a subset of the nodes
-     */
-
-    // NOT PRESENT IN THIS SIMPLE EXAMPLE
-
-    /*
      * We have configured the attributes we needed. Now, install and get the pointers
      * to the NetDevices, which contains all the NR stack:
      */
-
     NetDeviceContainer enbNetDev =
         nrHelper->InstallGnbDevice(gridScenario.GetBaseStations(), allBwps);
     NetDeviceContainer ueLowLatNetDev = nrHelper->InstallUeDevice(ueLowLatContainer, allBwps);
@@ -420,30 +296,11 @@ main(int argc, char* argv[])
     randomStream += nrHelper->AssignStreams(enbNetDev, randomStream);
     randomStream += nrHelper->AssignStreams(ueLowLatNetDev, randomStream);
     randomStream += nrHelper->AssignStreams(ueVoiceNetDev, randomStream);
-    /*
-     * Case (iii): Go node for node and change the attributes we have to setup
-     * per-node.
-     */
 
-    // Get the first netdevice (enbNetDev.Get (0)) and the first bandwidth part (0)
-    // and set the attribute.
-    nrHelper->GetGnbPhy(enbNetDev.Get(0), 0)
-        ->SetAttribute("Numerology", UintegerValue(numerologyBwp1));
-    nrHelper->GetGnbPhy(enbNetDev.Get(0), 0)
-        ->SetAttribute("TxPower", DoubleValue(10 * log10((bandwidthBand1 / totalBandwidth) * x)));
-
-    if (doubleOperationalBand)
-    {
-        // Get the first netdevice (enbNetDev.Get (0)) and the second bandwidth part (1)
-        // and set the attribute.
-        nrHelper->GetGnbPhy(enbNetDev.Get(0), 1)
-            ->SetAttribute("Numerology", UintegerValue(numerologyBwp2));
-        nrHelper->GetGnbPhy(enbNetDev.Get(0), 1)
-            ->SetTxPower(10 * log10((bandwidthBand2 / totalBandwidth) * x));
-    }
+    nrHelper->GetGnbPhy(enbNetDev.Get(0), 0)->SetAttribute("Numerology", UintegerValue(numerology));
+    nrHelper->GetGnbPhy(enbNetDev.Get(0), 0)->SetAttribute("TxPower", DoubleValue(10 * log10(x)));
 
     // When all the configuration is done, explicitly call UpdateConfig ()
-
     for (auto it = enbNetDev.Begin(); it != enbNetDev.End(); ++it)
     {
         DynamicCast<NrGnbNetDevice>(*it)->UpdateConfig();
@@ -453,14 +310,10 @@ main(int argc, char* argv[])
     {
         DynamicCast<NrUeNetDevice>(*it)->UpdateConfig();
     }
-
     for (auto it = ueVoiceNetDev.Begin(); it != ueVoiceNetDev.End(); ++it)
     {
         DynamicCast<NrUeNetDevice>(*it)->UpdateConfig();
     }
-
-    // From here, it is standard NS3. In the future, we will create helpers
-    // for this part as well.
 
     // create the internet and install the IP stack on the UEs
     // get SGW/PGW and create a single RemoteHost
@@ -486,10 +339,10 @@ main(int argc, char* argv[])
     remoteHostStaticRouting->AddNetworkRouteTo(Ipv4Address("7.0.0.0"), Ipv4Mask("255.0.0.0"), 1);
     internet.Install(gridScenario.GetUserTerminals());
 
-    Ipv4InterfaceContainer ueLowLatIpIface =
-        epcHelper->AssignUeIpv4Address(NetDeviceContainer(ueLowLatNetDev));
-    Ipv4InterfaceContainer ueVoiceIpIface =
-        epcHelper->AssignUeIpv4Address(NetDeviceContainer(ueVoiceNetDev));
+    Ipv4InterfaceContainer ueLowLatIpIface;
+    Ipv4InterfaceContainer ueVoiceIpIface;
+    ueLowLatIpIface = epcHelper->AssignUeIpv4Address(NetDeviceContainer(ueLowLatNetDev));
+    ueVoiceIpIface = epcHelper->AssignUeIpv4Address(NetDeviceContainer(ueVoiceNetDev));
 
     // Set the default gateway for the UEs
     for (uint32_t j = 0; j < gridScenario.GetUserTerminals().GetN(); ++j)
@@ -499,7 +352,7 @@ main(int argc, char* argv[])
         ueStaticRouting->SetDefaultRoute(epcHelper->GetUeDefaultGatewayAddress(), 1);
     }
 
-    // attach UEs to the closest eNB
+    // attach UEs to the closest gNB
     nrHelper->AttachToClosestEnb(ueLowLatNetDev, enbNetDev);
     nrHelper->AttachToClosestEnb(ueVoiceNetDev, enbNetDev);
 
@@ -559,14 +412,11 @@ main(int argc, char* argv[])
     dlpfVoice.localPortEnd = dlPortVoice;
     voiceTft->Add(dlpfVoice);
 
-    /*
-     * Let's install the applications!
-     */
+    //  Install the applications
     ApplicationContainer clientApps;
 
     for (uint32_t i = 0; i < ueLowLatContainer.GetN(); ++i)
     {
-        Ptr<Node> ue = ueLowLatContainer.Get(i);
         Ptr<NetDevice> ueDevice = ueLowLatNetDev.Get(i);
         Address ueAddress = ueLowLatIpIface.GetAddress(i);
 
@@ -581,7 +431,6 @@ main(int argc, char* argv[])
 
     for (uint32_t i = 0; i < ueVoiceContainer.GetN(); ++i)
     {
-        Ptr<Node> ue = ueVoiceContainer.Get(i);
         Ptr<NetDevice> ueDevice = ueVoiceNetDev.Get(i);
         Address ueAddress = ueVoiceIpIface.GetAddress(i);
 
@@ -691,11 +540,8 @@ main(int argc, char* argv[])
         outFile << "  Rx Packets: " << i->second.rxPackets << "\n";
     }
 
-    double meanFlowThroughput = averageFlowThroughput / stats.size();
-    double meanFlowDelay = averageFlowDelay / stats.size();
-
-    outFile << "\n\n  Mean flow throughput: " << meanFlowThroughput << "\n";
-    outFile << "  Mean flow delay: " << meanFlowDelay << "\n";
+    outFile << "\n\n  Mean flow throughput: " << averageFlowThroughput / stats.size() << "\n";
+    outFile << "  Mean flow delay: " << averageFlowDelay / stats.size() << "\n";
 
     outFile.close();
 
@@ -707,43 +553,5 @@ main(int argc, char* argv[])
     }
 
     Simulator::Destroy();
-
-    if (argc == 0)
-    {
-        double toleranceMeanFlowThroughput = 0.0001 * 56.258560;
-        double toleranceMeanFlowDelay = 0.0001 * 0.553292;
-
-        if (meanFlowThroughput >= 56.258560 - toleranceMeanFlowThroughput &&
-            meanFlowThroughput <= 56.258560 + toleranceMeanFlowThroughput &&
-            meanFlowDelay >= 0.553292 - toleranceMeanFlowDelay &&
-            meanFlowDelay <= 0.553292 + toleranceMeanFlowDelay)
-        {
-            return EXIT_SUCCESS;
-        }
-        else
-        {
-            return EXIT_FAILURE;
-        }
-    }
-    else if (argc == 1 and ueNumPergNb == 9) // called from examples-to-run.py with these parameters
-    {
-        double toleranceMeanFlowThroughput = 0.0001 * 47.858536;
-        double toleranceMeanFlowDelay = 0.0001 * 10.504189;
-
-        if (meanFlowThroughput >= 47.858536 - toleranceMeanFlowThroughput &&
-            meanFlowThroughput <= 47.858536 + toleranceMeanFlowThroughput &&
-            meanFlowDelay >= 10.504189 - toleranceMeanFlowDelay &&
-            meanFlowDelay <= 10.504189 + toleranceMeanFlowDelay)
-        {
-            return EXIT_SUCCESS;
-        }
-        else
-        {
-            return EXIT_FAILURE;
-        }
-    }
-    else
-    {
-        return EXIT_SUCCESS; // we dont check other parameters configurations at the moment
-    }
+    return 0;
 }
