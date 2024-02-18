@@ -27,6 +27,14 @@
 #include <algorithm>
 #include <iostream>
 
+#include "ns3/stats-module.h"
+#include <string>
+
+#include "ns3/gnuplot-helper.h"
+#include "ns3/flow-monitor-helper.h"
+#include "ns3/flow-monitor.h"
+#include <fstream> // Include this at the top of your file
+
 using namespace ns3;
 
 /*
@@ -693,7 +701,7 @@ void reportFlowStats(Ptr<FlowMonitor> monitor,Ptr<Ipv4FlowClassifier> classifier
     double delayValues[stats.size()];
     uint64_t cont = 0;
 
-    outFile.open(filename.c_str(), std::ofstream::out | std::ofstream::trunc);
+    outFile.open(filename.c_str(), std::ofstream::out | std::ofstream::app);
     if (!outFile.is_open())
     {
         std::cerr << "Can't open file " << filename << std::endl;
@@ -727,6 +735,7 @@ void reportFlowStats(Ptr<FlowMonitor> monitor,Ptr<Ipv4FlowClassifier> classifier
                   << " Mbps\n";
         std::cout << "  Rx Packets: " << i->second.rxPackets << "\n";
         std::cout << "  Rx Bytes:   " << i->second.rxBytes << "\n";
+
         if (i->second.rxPackets > 0)
         {
             // Measure the duration of the flow from receiver's perspective
@@ -803,9 +812,11 @@ void reportFlowStats(Ptr<FlowMonitor> monitor,Ptr<Ipv4FlowClassifier> classifier
     // double FiftyTileFlowDelay = (delayValues[stats.size()/2] + delayValues[stats.size()/2 -1])/2;
     double FiftyTileFlowDelay = delayValues[stats.size() / 2];
 
-    outFile << "\n\n  Mean flow throughput: " << averageFlowThroughput / stats.size() << "\n";
-    outFile << "  Mean flow delay: " << averageFlowDelay / stats.size() << "\n";
-    outFile << "  Median flow delay: " << FiftyTileFlowDelay << "\n";
+    // outFile << "\n\n  Mean flow throughput: " << averageFlowThroughput / stats.size() << "\n";
+    // outFile << "  Mean flow delay: " << averageFlowDelay / stats.size() << "\n";
+    // outFile << "  Median flow delay: " << FiftyTileFlowDelay << "\n";
+
+    outFile << Simulator::Now().GetSeconds() << "\t" << averageFlowThroughput / stats.size() << "\t" << averageFlowDelay / stats.size() << "\t" << FiftyTileFlowDelay << "\n";
 
     outFile.close();
 
@@ -835,6 +846,19 @@ void reportFlowStats(Ptr<FlowMonitor> monitor,Ptr<Ipv4FlowClassifier> classifier
 int
 main(int argc, char* argv[])
 {
+
+    // Initialize FlowMonitor
+    // Ptr<FlowMonitor> flowMonitor;
+    // FlowMonitorHelper flowHelper;
+    // std::ofstream outFile("throughput-data.txt");
+
+    // Setup GnuplotHelper for Throughput
+    // GnuplotHelper plotHelper;
+    // plotHelper.ConfigurePlot("throughput-plot",
+                            // "Throughput over Time",
+                            // "Time (Seconds)",
+                            // "Throughput (Mbps)");
+
     /*
      * Variables that represent the parameters we will accept as input by the
      * command line. Each of them is initialized with a default value.
@@ -868,7 +892,7 @@ main(int argc, char* argv[])
     std::string operationMode = "TDD"; // TDD or FDD
 
     // Where we will store the output files.
-    std::string simTag = "default";
+    std::string simTag = "throughput-data.dat";
     std::string outputDir = "./";
     bool logging = false;
     bool traces = true;
@@ -1409,6 +1433,7 @@ main(int argc, char* argv[])
                 // Seed the ARP cache by pinging early in the simulation
                 // This is a workaround until a static ARP capability is provided
                 V4PingHelper ping(ipAddress);
+                pingApps.Add(ping.Install(remoteHostContainer));
                 pingApps.Add(ping.Install(remoteHostContainer));
             }
             // configure clients on sector 2
@@ -2022,19 +2047,34 @@ main(int argc, char* argv[])
     endpointNodes.Add(remoteHost);
     endpointNodes.Add(gridScenario.GetUserTerminals());
 
-    Ptr<ns3::FlowMonitor> monitor = flowmonHelper.Install(endpointNodes);
-    monitor->SetAttribute("DelayBinWidth", DoubleValue(0.001));
-    monitor->SetAttribute("JitterBinWidth", DoubleValue(0.001));
-    monitor->SetAttribute("PacketSizeBinWidth", DoubleValue(20));
+    Ptr<ns3::FlowMonitor> flowMonitor = flowmonHelper.Install(endpointNodes);
+    flowMonitor->SetAttribute("DelayBinWidth", DoubleValue(0.001));
+    flowMonitor->SetAttribute("JitterBinWidth", DoubleValue(0.001));
+    flowMonitor->SetAttribute("PacketSizeBinWidth", DoubleValue(20));
     std::string filename = outputDir + "/" + simTag;
 
     Simulator::Stop(simTime);
-    monitor->CheckForLostPackets();
+    flowMonitor->CheckForLostPackets();
     Ptr<Ipv4FlowClassifier> classifier =
         DynamicCast<Ipv4FlowClassifier>(flowmonHelper.GetClassifier());
-    std::ofstream outFile;
-    Simulator::Schedule(MilliSeconds(500),&reportFlowStats,monitor,classifier,filename,std::ref(outFile));
+    std::ofstream traceOutFile;
+    Simulator::Schedule(MilliSeconds(500),&reportFlowStats,flowMonitor,classifier,filename,std::ref(traceOutFile));
     Simulator::Run();
+    /*
+    flowMonitor = flowmonHelper.GetMonitor();
+    std::map<FlowId, FlowMonitor::FlowStats> flowStats = flowMonitor->GetFlowStats();
+
+    for (auto it = flowStats.begin(); it != flowStats.end(); ++it) {
+        auto flowId = it->first;
+        auto stats = it->second;
+        double throughput = stats.rxBytes * 8.0 / (stats.timeLastRxPacket.GetSeconds() - stats.timeFirstTxPacket.GetSeconds()) / 1024 / 1024; // Mbps
+
+        // Write time, flow ID, and throughput to the file
+        outFile << Simulator::Now().GetSeconds() << "\t" << flowId << "\t" << throughput << std::endl;
+    }
+
+    outFile.close(); // Close the file after writing
+    */
 
     // Print per-flow statistics
     std::cout << "I've been called! \n ";
