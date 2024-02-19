@@ -794,6 +794,7 @@ void reportFlowStats(Ptr<FlowMonitor> monitor,Ptr<Ipv4FlowClassifier> classifier
 	    std::cout << "Measurements_MeanJitter : " << measurements.meanJitter << " ms\n";
 	    std::cout << "\n";
 
+        outFile << Simulator::Now().GetMilliSeconds() << "\t" << measurements.throughput.GetMilliSeconds() << "\t" << measurements.meanDelay.GetMilliSeconds() << "\t" << measurements.lastPacketDelay.GetMilliSeconds() << "\t" << measurements.meanJitter.GetMilliSeconds() << "\n";
         }
         else
         {
@@ -815,7 +816,6 @@ void reportFlowStats(Ptr<FlowMonitor> monitor,Ptr<Ipv4FlowClassifier> classifier
     // outFile << "  Mean flow delay: " << averageFlowDelay / stats.size() << "\n";
     // outFile << "  Median flow delay: " << FiftyTileFlowDelay << "\n";
 
-    outFile << Simulator::Now().GetSeconds() << "\t" << averageFlowThroughput / stats.size() << "\t" << averageFlowDelay / stats.size() << "\t" << FiftyTileFlowDelay << "\n";
 
     outFile.close();
 
