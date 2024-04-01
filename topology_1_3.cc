@@ -678,6 +678,124 @@ operator>>(std::istream& is, TrafficTypeConf& item)
     return is;
 }
 
+bool compareByTime(const std::pair<uint32_t, ns3::Time>& a, const std::pair<uint32_t, ns3::Time>& b) {
+    return a.second.Compare(b.second) < 0;
+}
+
+void nodeToNodeTrigger(Ptr<FlowMonitor> monitor)
+// This function implements the first step in looking for the cause of a bad metric
+// Given a flow_id, we look for the worst performing FlowProbes
+{
+    FlowMonitor::FlowStatsContainer stats = monitor->GetFlowStats();
+    FlowMonitor::FlowProbeContainer probes = monitor->GetAllProbes();
+    std::map<std::pair<uint32_t,uint32_t>,ns3::Time> nodeToNodeDelay;
+
+    for (FlowMonitor::FlowStatsContainer::const_iterator flowStatsIt = stats.begin();
+        flowStatsIt != stats.end();
+        ++flowStatsIt)
+    {
+        FlowId flowId = flowStatsIt->first;  
+        std::map<uint32_t,std::vector<std::pair<uint32_t,ns3::Time>>> perPacketStats;
+
+    // FlowMonitor::FlowStatsContainer::iterator flowStatsIt = stats.find(flowId);
+    // if (flowStatsIt != stats.end())
+    // {
+        // We iterate over all packets that have been received
+        uint32_t maxPacketId = flowStatsIt->second.rxPackets;
+        for (uint32_t packetId = 0; packetId < maxPacketId; ++packetId)
+        {
+            std::map<uint32_t,FlowProbe::FlowStats> nodeProbeStats;
+            for (ns3::Ptr<ns3::FlowProbe> probe : probes)
+            {
+                FlowProbe::Stats probeStats = probe->GetStats();
+                Ptr<BigBrotherFlowProbe> bigBrotherProbe = DynamicCast<BigBrotherFlowProbe>(probe);
+                // We only work measure in the probes that are ipv4/bigBrother
+                if (bigBrotherProbe)
+                {
+                    // std::cout << "bigBrotherProbe id:" << bigBrotherProbe->m_nodeId << std::endl;
+
+                    std::map<std::pair<uint32_t,uint32_t>, FlowProbe::FlowStats>::const_iterator it = bigBrotherProbe->m_perPacketStats.find(std::make_pair(flowId, packetId));
+                    if (it != bigBrotherProbe->m_perPacketStats.end())
+                    {
+                        FlowProbe::FlowStats flowProbeStats = it->second;
+                        // std::cout << "bigBrotherProbe delay:" << flowProbeStats.delayFromFirstProbeSum << std::endl;
+
+                        std::map<uint32_t,std::vector<std::pair<uint32_t,ns3::Time>>>::iterator perPacketStatsIt = perPacketStats.find(packetId);
+                        std::vector<std::pair<uint32_t,ns3::Time>> nodeAcc;
+                        if (perPacketStatsIt != perPacketStats.end())
+                        {
+                            // std::cout << "packetId already in perpacketstats, packetId=" << packetId << std::endl;
+                            nodeAcc = perPacketStatsIt->second;
+                            // for(std::pair<uint32_t,ns3::Time> it : nodeAcc)
+                            // {
+                            //     std::cout << "Node id:" << it.first << "Delay" << it.second << std::endl;
+                            // }
+                        }
+                        nodeAcc.push_back(std::make_pair(bigBrotherProbe->m_nodeId,flowProbeStats.delayFromFirstProbeSum));
+                        // std::cout << "Node ACC after updating:" << std::endl;
+                        // for(std::pair<uint32_t,ns3::Time> it : nodeAcc)
+                        // {
+                        //     std::cout << "Node id:" << it.first << "Delay" << it.second << std::endl;
+                        // }
+                        try 
+                        {
+                            perPacketStats.insert_or_assign(packetId, nodeAcc);
+                        } catch (const std::exception& e)
+                        {
+                            std::cerr << "Error inserting into perPacketStats: " << e.what() << std::endl;
+                        }
+                    }
+
+                } 
+            }
+        
+        }
+        for(std::map<uint32_t,std::vector<std::pair<uint32_t,ns3::Time>>>::const_iterator it = perPacketStats.begin(); it != perPacketStats.end(); ++it)
+        {   
+            std::vector<std::pair<uint32_t,ns3::Time>> nodesDelay = it->second;
+            // for(std::pair<uint32_t,ns3::Time> pairIt : nodesDelay)
+            // {
+            //     std::cout << "\tNode id: " << pairIt.first << " Delay: " << pairIt.second << "\n" << std::endl;
+            // }
+            std::sort(nodesDelay.begin(), nodesDelay.end(), compareByTime);
+            // std::cout << "Delays sorted" << std::endl;
+            // for(std::pair<uint32_t,ns3::Time> pairIt : nodesDelay)
+            // {
+            //     std::cout << "\tNode id: " << pairIt.first << " Delay: " << pairIt.second << "\n" << std::endl;
+            // }
+            for(size_t i = 0; i < nodesDelay.size() - 1;++i)
+            {
+                // We insert the pairs with the lesser nodeId first, and the delay of the second
+                uint32_t firstNode;
+                uint32_t secondNode;
+                if (nodesDelay[i].first < nodesDelay[i+1].first)
+                {
+                    firstNode = nodesDelay[i].first ;
+                    secondNode = nodesDelay[i+1].first ;
+                } else 
+                {
+                    firstNode = nodesDelay[i+1].first ;
+                    secondNode = nodesDelay[i].first ;
+                }
+                std::map<std::pair<uint32_t,uint32_t>,ns3::Time>::const_iterator findIt = nodeToNodeDelay.find(std::make_pair(firstNode,secondNode));
+                ns3::Time delayAcc;
+                if (findIt != nodeToNodeDelay.end())
+                {
+                    delayAcc = findIt->second;
+                }
+                //The measure of delay to every node-to-node metric, is the avg for every package
+                delayAcc += (nodesDelay[i+1].second - nodesDelay[i].second)/maxPacketId;
+                nodeToNodeDelay.insert_or_assign(std::make_pair(firstNode,secondNode),delayAcc );
+            }
+        }
+    }
+    std::cout << "Per node-to-node delays:" << std::endl;
+    for(std::map<std::pair<uint32_t,uint32_t>,ns3::Time>::iterator nodeToNodeDelayIt = nodeToNodeDelay.begin();nodeToNodeDelayIt != nodeToNodeDelay.end() ; ++nodeToNodeDelayIt)
+    {
+        std::cout<< "("<< nodeToNodeDelayIt->first.first << "," << nodeToNodeDelayIt->first.second << ") -> " << nodeToNodeDelayIt->second << std::endl;
+    }
+}
+
 void reportFlowStats(Ptr<FlowMonitor> monitor,Ptr<Ipv4FlowClassifier> classifier,std::string filename , std::ofstream& outFile){
 
     //throughput*, meanDelay, lastPacketDelay*, meanJitter* 
@@ -687,8 +805,6 @@ void reportFlowStats(Ptr<FlowMonitor> monitor,Ptr<Ipv4FlowClassifier> classifier
 
     ns3::Time NETWORK_OK_MEASURING_TIME = MilliSeconds(50);
     ns3::Time NETWORK_NOT_OK_MEASURING_TIME = MilliSeconds(25);
-
-    std::cout << "I've been called inside! \n ";
     
     FlowMonitor::FlowStatsContainer stats = monitor->GetFlowStats();
     // Redefining because we're prototyping
@@ -834,12 +950,13 @@ void reportFlowStats(Ptr<FlowMonitor> monitor,Ptr<Ipv4FlowClassifier> classifier
         measurements.meanJitter > thresholds.meanJitter
     ){
         MEASURING_TIME = NETWORK_NOT_OK_MEASURING_TIME;
+        // TODO: include the reportNodeToNode function invokation here
     } 
     else{
 
         MEASURING_TIME = NETWORK_OK_MEASURING_TIME;
     }
-    // FlowMonitor::ResetAllStats()
+    nodeToNodeTrigger(monitor);
     monitor->ResetAllStats();
     Simulator::Schedule(MEASURING_TIME, &reportFlowStats, monitor, classifier, filename, std::ref(outFile));
 }
