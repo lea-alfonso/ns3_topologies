@@ -839,17 +839,17 @@ void reportFlowStats(Ptr<FlowMonitor> monitor,Ptr<Ipv4FlowClassifier> classifier
         {
             protoStream.str("UDP");
         }
-        std::cout << "Flow " << i->first << " (" << t.sourceAddress << ":" << t.sourcePort << " -> "
-                  << t.destinationAddress << ":" << t.destinationPort << ") proto "
-                  << protoStream.str() << "\n";
-        std::cout << "  Tx Packets: " << i->second.txPackets << "\n";
-        std::cout << "  Tx Bytes:   " << i->second.txBytes << "\n";
-        std::cout << "  TxOffered:  "
-                  << i->second.txBytes * 8.0 / (simTime - appStartTime).GetSeconds() / 1000.0 /
-                         1000.0
-                  << " Mbps\n";
-        std::cout << "  Rx Packets: " << i->second.rxPackets << "\n";
-        std::cout << "  Rx Bytes:   " << i->second.rxBytes << "\n";
+        // std::cout << "Flow " << i->first << " (" << t.sourceAddress << ":" << t.sourcePort << " -> "
+        //           << t.destinationAddress << ":" << t.destinationPort << ") proto "
+        //           << protoStream.str() << "\n";
+        // std::cout << "  Tx Packets: " << i->second.txPackets << "\n";
+        // std::cout << "  Tx Bytes:   " << i->second.txBytes << "\n";
+        // std::cout << "  TxOffered:  "
+        //           << i->second.txBytes * 8.0 / (simTime - appStartTime).GetSeconds() / 1000.0 /
+        //                  1000.0
+        //           << " Mbps\n";
+        // std::cout << "  Rx Packets: " << i->second.rxPackets << "\n";
+        // std::cout << "  Rx Bytes:   " << i->second.rxBytes << "\n";
 
         if (i->second.rxPackets > 0)
         {
@@ -863,62 +863,61 @@ void reportFlowStats(Ptr<FlowMonitor> monitor,Ptr<Ipv4FlowClassifier> classifier
             delayValues[cont] = 1000 * i->second.delaySum.GetSeconds() / i->second.rxPackets;
             cont++;
 
-	    //measurements.throughput = i->second.rxBytes * 8.0 / rxDuration / 1000 / 1000;
-        measurements.throughput = Time(Seconds(i->second.rxBytes * 8.0 / rxDuration / 1000 / 1000));
+            //measurements.throughput = i->second.rxBytes * 8.0 / rxDuration / 1000 / 1000;
+            measurements.throughput = Time(Seconds(i->second.rxBytes * 8.0 / rxDuration / 1000 / 1000));
 
-	    //measurements.meanDelay = double(1000 * i->second.delaySum.GetSeconds()) / (i->second.rxPackets);
-        measurements.meanDelay = MilliSeconds(double(1000 * i->second.delaySum.GetSeconds()) / i->second.rxPackets);
+            //measurements.meanDelay = double(1000 * i->second.delaySum.GetSeconds()) / (i->second.rxPackets);
+            measurements.meanDelay = MilliSeconds(double(1000 * i->second.delaySum.GetSeconds()) / i->second.rxPackets);
 
-	    //measurements.lastPacketDelay = i->second.lastDelay.As(Time::MS);
-        measurements.lastPacketDelay = MilliSeconds(i->second.lastDelay.GetMilliSeconds());
+            //measurements.lastPacketDelay = i->second.lastDelay.As(Time::MS);
+            measurements.lastPacketDelay = MilliSeconds(i->second.lastDelay.GetMilliSeconds());
 
-	    //measurements.meanJitter = 1000 * i->second.jitterSum.GetSeconds() / i->second.rxPackets;
-        measurements.meanJitter = MilliSeconds(1000 * i->second.jitterSum.GetSeconds() / i->second.rxPackets);
+            //measurements.meanJitter = 1000 * i->second.jitterSum.GetSeconds() / i->second.rxPackets;
+            measurements.meanJitter = MilliSeconds(1000 * i->second.jitterSum.GetSeconds() / i->second.rxPackets);
 
 
-            std::cout << "  Throughput_Old: " << i->second.rxBytes * 8.0 / rxDuration / 1000 / 1000
-                      << " Mbps\n";
+                std::cout << "  Throughput_Old: " << i->second.rxBytes * 8.0 / rxDuration / 1000 / 1000
+                        << " Mbps\n";
 
-            std::cout << "  Throughput_New: " << measurements.throughput
-                      << " Mbps\n";
+                std::cout << "  Throughput_New: " << measurements.throughput
+                        << " Mbps\n";
 
-            std::cout << "  Mean delay_Old:  "
-                      << double(1000 * i->second.delaySum.GetSeconds()) / (i->second.rxPackets) 
-                      << " ms\n";
+                std::cout << "  Mean delay_Old:  "
+                        << double(1000 * i->second.delaySum.GetSeconds()) / (i->second.rxPackets) 
+                        << " ms\n";
 
-            std::cout << "  Mean delay_New:  "
-                      << measurements.meanDelay 
-                      << " ms\n";
+                std::cout << "  Mean delay_New:  "
+                        << measurements.meanDelay 
+                        << " ms\n";
 
-            std::cout << "  Last packet delay_Old: " << MilliSeconds(i->second.lastDelay.GetMilliSeconds()) << " ms\n";
-            std::cout << "  Last packet delay_New: " << measurements.lastPacketDelay << " ms\n";
+                std::cout << "  Last packet delay_Old: " << MilliSeconds(i->second.lastDelay.GetMilliSeconds()) << " ms\n";
+                std::cout << "  Last packet delay_New: " << measurements.lastPacketDelay << " ms\n";
 
-            // std::cout << "  Mean upt:  " << i->second.uptSum / i->second.rxPackets / 1000/1000 <<
-            // " Mbps \n";
+                // std::cout << "  Mean upt:  " << i->second.uptSum / i->second.rxPackets / 1000/1000 <<
+                // " Mbps \n";
 
-            std::cout << "  Mean jitter_Old:  "
-                      << 1000 * i->second.jitterSum.GetSeconds() / i->second.rxPackets << " ms\n";
+                std::cout << "  Mean jitter_Old:  "
+                        << 1000 * i->second.jitterSum.GetSeconds() / i->second.rxPackets << " ms\n";
 
-            std::cout << "  Mean jitter_New:  "
-                      << measurements.meanJitter << " ms\n";
+                std::cout << "  Mean jitter_New:  "
+                        << measurements.meanJitter << " ms\n";
 
-	    std::cout << "\n";
-	    std::cout << "Measurements :" << "\n";
-	    std::cout << "Measurements_Throughput : " << measurements.throughput << " Mbps\n";
-	    std::cout << "Measurements_MeanDelay : " << measurements.meanDelay << " ms\n";
-	    std::cout << "Measurements_LastPacketDelay : " << measurements.lastPacketDelay << " ms\n";
-	    std::cout << "Measurements_MeanJitter : " << measurements.meanJitter << " ms\n";
-	    std::cout << "\n";
+            std::cout << "\n";
+            std::cout << "Measurements :" << "\n";
+            std::cout << "Measurements_Throughput : " << measurements.throughput << " Mbps\n";
+            std::cout << "Measurements_MeanDelay : " << measurements.meanDelay << " ms\n";
+            std::cout << "Measurements_LastPacketDelay : " << measurements.lastPacketDelay << " ms\n";
+            std::cout << "Measurements_MeanJitter : " << measurements.meanJitter << " ms\n";
+            std::cout << "\n";
 
-        outFile << Simulator::Now().GetMilliSeconds() << "\t" << measurements.throughput.GetMilliSeconds() << "\t" << measurements.meanDelay.GetMilliSeconds() << "\t" << measurements.lastPacketDelay.GetMilliSeconds() << "\t" << measurements.meanJitter.GetMilliSeconds() << "\n";
-        }
-        else
+            outFile << Simulator::Now().GetMilliSeconds() << "\t" << measurements.throughput.GetMilliSeconds() << "\t" << measurements.meanDelay.GetMilliSeconds() << "\t" << measurements.lastPacketDelay.GetMilliSeconds() << "\t" << measurements.meanJitter.GetMilliSeconds() << "\n";
+        } else
         {
-            // outFile << "  Throughput:  0 Mbps\n";
-            // outFile << "  Mean delay:  0 ms\n";
-            // outFile << "  Mean jitter: 0 ms\n";
+            outFile << "  Throughput:  0 Mbps\n";
+            outFile << "  Mean delay:  0 ms\n";
+            outFile << "  Mean jitter: 0 ms\n";
+            outFile << "  Rx Packets: " << i->second.rxPackets << "\n";
         }
-        // outFile << "  Rx Packets: " << i->second.rxPackets << "\n";
     }
     std::sort(delayValues, delayValues + stats.size());
     // for (uint32_t i = 0; i < stats.size(); i++)
@@ -937,10 +936,6 @@ void reportFlowStats(Ptr<FlowMonitor> monitor,Ptr<Ipv4FlowClassifier> classifier
 
     std::ifstream f(filename.c_str());
 
-    if (f.is_open())
-    {
-        std::cout << f.rdbuf();
-    }
 
     ns3::Time MEASURING_TIME; 
     if(
