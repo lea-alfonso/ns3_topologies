@@ -790,14 +790,28 @@ void nodeToNodeTrigger(Ptr<FlowMonitor> monitor)
         }
     }
     std::cout << "Per node-to-node delays:" << std::endl;
+    ns3::Time maxDelay;
+    std::pair<uint32_t,uint32_t> maxDelayIndex;
     for(std::map<std::pair<uint32_t,uint32_t>,ns3::Time>::iterator nodeToNodeDelayIt = nodeToNodeDelay.begin();nodeToNodeDelayIt != nodeToNodeDelay.end() ; ++nodeToNodeDelayIt)
     {
         std::cout<< "("<< nodeToNodeDelayIt->first.first << "," << nodeToNodeDelayIt->first.second << ") -> " << nodeToNodeDelayIt->second << std::endl;
+        if (nodeToNodeDelayIt->second > maxDelay)
+        {
+            maxDelay = nodeToNodeDelayIt->second;
+            maxDelayIndex = nodeToNodeDelayIt->first;
+        }
     }
+    std::cout << Simulator::Now() <<"The bottle neck link is:" << "("<< maxDelayIndex.first << ", " << maxDelayIndex.second << ") " << "with a delay of " << maxDelay << std::endl;
+}
+
+// Assuming p2ph is your PointToPointHelper instance
+void ChangeDataRate(PointToPointHelper &p2p) {
+    p2p.SetDeviceAttribute("DataRate", StringValue("25Mbps"));
 }
 
 void reportFlowStats(Ptr<FlowMonitor> monitor,Ptr<Ipv4FlowClassifier> classifier,std::string filename , std::ofstream& outFile){
 
+    std::cout << "Report flow stats " << std::endl;
     //throughput*, meanDelay, lastPacketDelay*, meanJitter* 
     //TrackedStats variableName(double throughput, double meanDelay, double lastPacketDelay, double meanJitter);
     TrackedStats measurements(Seconds(0), Seconds(0), Seconds(0), Seconds(0));
@@ -805,7 +819,7 @@ void reportFlowStats(Ptr<FlowMonitor> monitor,Ptr<Ipv4FlowClassifier> classifier
 
     ns3::Time NETWORK_OK_MEASURING_TIME = MilliSeconds(50);
     ns3::Time NETWORK_NOT_OK_MEASURING_TIME = MilliSeconds(25);
-    
+
     FlowMonitor::FlowStatsContainer stats = monitor->GetFlowStats();
     // Redefining because we're prototyping
     Time simTime = MilliSeconds(1400);
@@ -1228,19 +1242,62 @@ main(int argc, char* argv[])
     p2ph.SetDeviceAttribute("DataRate", DataRateValue(DataRate("100Gb/s")));
     p2ph.SetDeviceAttribute("Mtu", UintegerValue(2500));
     p2ph.SetChannelAttribute("Delay", TimeValue(Seconds(0.000)));
-    p2ph.EnablePcapAll("leas-test",true);
-    NetDeviceContainer internetDevices = p2ph.Install(pgw, remoteHost);
+    // p2ph.EnablePcapAll("leas-test",true);
     Ipv4AddressHelper ipv4h;
     Ipv4StaticRoutingHelper ipv4RoutingHelper;
     ipv4h.SetBase("1.0.0.0", "255.0.0.0");
-    Ipv4InterfaceContainer internetIpIfaces = ipv4h.Assign(internetDevices);
-    Ptr<Ipv4StaticRouting> remoteHostStaticRouting =
-        ipv4RoutingHelper.GetStaticRouting(remoteHost->GetObject<Ipv4>());
-    remoteHostStaticRouting->AddNetworkRouteTo(Ipv4Address("7.0.0.0"), Ipv4Mask("255.0.0.0"), 1);
     internet.Install(gridScenario.GetUserTerminals());
 
     // if the mixed traffic type selected then determine for each which container IDs correposnd to
     // each traffic type
+
+    // Create additional nodes
+    NodeContainer intermediateNodes;
+    intermediateNodes.Create(2); // Creating two intermediate nodes
+    internet.Install(intermediateNodes);
+
+    // Connect pgw to the first intermediate node
+    NodeContainer link1 = NodeContainer(pgw, intermediateNodes.Get(0));
+    NetDeviceContainer link1Devices = p2ph.Install(link1);
+    Ipv4InterfaceContainer link1Interfaces = ipv4h.Assign(link1Devices);
+
+    // Configure the bottle neck
+    p2ph.SetDeviceAttribute("DataRate", DataRateValue(DataRate("15Mb/s")));
+    p2ph.SetDeviceAttribute("Mtu", UintegerValue(2500));
+    p2ph.SetChannelAttribute("Delay", TimeValue(Seconds(0.000)));
+
+    // Connect the intermediate nodes
+    NodeContainer link2 = NodeContainer(intermediateNodes.Get(0), intermediateNodes.Get(1));
+    NetDeviceContainer link2Devices = p2ph.Install(link2);
+    Ipv4InterfaceContainer link2Interfaces = ipv4h.Assign(link2Devices);
+
+    // Configure the bottle neck
+    p2ph.SetDeviceAttribute("DataRate", DataRateValue(DataRate("10Mb/s")));
+    p2ph.SetDeviceAttribute("Mtu", UintegerValue(2500));
+    p2ph.SetChannelAttribute("Delay", TimeValue(Seconds(0.000)));
+ 
+    // Connect the second intermediate node to the remoteHost
+    NodeContainer link3 = NodeContainer(intermediateNodes.Get(1), remoteHost);
+    NetDeviceContainer link3Devices = p2ph.Install(link3);
+    Ipv4InterfaceContainer link3Interfaces = ipv4h.Assign(link3Devices);
+    Ipv4Address remoteHostAddr = link3Interfaces.GetAddress(1);
+    Simulator::Schedule(MilliSeconds(1300), &ChangeDataRate, p2ph);
+    // Configure routing
+    Ptr<Ipv4StaticRouting> pgwStaticRouting = ipv4RoutingHelper.GetStaticRouting(pgw->GetObject<Ipv4>());
+    // We connect pgw to intermediate_node_1
+    pgwStaticRouting->SetDefaultRoute(link1Interfaces.GetAddress(1), 1);
+
+    Ptr<Ipv4StaticRouting> node1StaticRouting = ipv4RoutingHelper.GetStaticRouting(intermediateNodes.Get(0)->GetObject<Ipv4>());
+    node1StaticRouting->SetDefaultRoute(link2Interfaces.GetAddress(1), 1);
+    // node1StaticRouting->AddNetworkRouteTo(link1Interfaces.GetAddress(0), Ipv4Mask("255.255.255.0"), 2);
+
+    Ptr<Ipv4StaticRouting> node2StaticRouting = ipv4RoutingHelper.GetStaticRouting(intermediateNodes.Get(1)->GetObject<Ipv4>());
+    node2StaticRouting->SetDefaultRoute(remoteHostAddr, 1);
+    // node2StaticRouting->AddNetworkRouteTo(link2Interfaces.GetAddress(0), Ipv4Mask("255.255.255.0"), 2);
+
+    Ptr<Ipv4StaticRouting> remoteHostStaticRouting = ipv4RoutingHelper.GetStaticRouting(remoteHost->GetObject<Ipv4>());
+    remoteHostStaticRouting->AddNetworkRouteTo(Ipv4Address("7.0.0.0"), Ipv4Mask("255.0.0.0"), 1);
+    // remoteHostStaticRouting->AddNetworkRouteTo(link3Interfaces.GetAddress(0), Ipv4Mask("255.255.255.0"), 2);
 
     std::set<uint16_t> ngmnFtpIds;
     std::set<uint16_t> ngmnVideoIds;
@@ -1308,8 +1365,6 @@ main(int argc, char* argv[])
         epcHelper->AssignUeIpv4Address(NetDeviceContainer(ueSector2NetDev));
     Ipv4InterfaceContainer ueSector3IpIface =
         epcHelper->AssignUeIpv4Address(NetDeviceContainer(ueSector3NetDev));
-
-    Ipv4Address remoteHostAddr = internetIpIfaces.GetAddress(1);
 
     // Set the default gateway for the UEs
     for (uint32_t j = 0; j < gridScenario.GetUserTerminals().GetN(); ++j)
@@ -2159,6 +2214,8 @@ main(int argc, char* argv[])
     NodeContainer endpointNodes;
     endpointNodes.Add(remoteHost);
     endpointNodes.Add(gridScenario.GetUserTerminals());
+    endpointNodes.Add(intermediateNodes);
+    endpointNodes.Add(pgw);
 
     Ptr<ns3::FlowMonitor> flowMonitor = flowmonHelper.Install(endpointNodes);
     flowMonitor->SetAttribute("DelayBinWidth", DoubleValue(0.001));
@@ -2173,24 +2230,7 @@ main(int argc, char* argv[])
     std::ofstream traceOutFile;
     Simulator::Schedule(MilliSeconds(500),&reportFlowStats,flowMonitor,classifier,filename,std::ref(traceOutFile));
     Simulator::Run();
-    /*
-    flowMonitor = flowmonHelper.GetMonitor();
-    std::map<FlowId, FlowMonitor::FlowStats> flowStats = flowMonitor->GetFlowStats();
-
-    for (auto it = flowStats.begin(); it != flowStats.end(); ++it) {
-        auto flowId = it->first;
-        auto stats = it->second;
-        double throughput = stats.rxBytes * 8.0 / (stats.timeLastRxPacket.GetSeconds() - stats.timeFirstTxPacket.GetSeconds()) / 1024 / 1024; // Mbps
-
-        // Write time, flow ID, and throughput to the file
-        outFile << Simulator::Now().GetSeconds() << "\t" << flowId << "\t" << throughput << std::endl;
-    }
-
-    outFile.close(); // Close the file after writing
-    */
-
-    // Print per-flow statistics
-    std::cout << "I've been called! \n ";
+    // reportFlowStats(flowMonitor,classifier,filename,std::ref(traceOutFile));
 
     Simulator::Destroy();
     return 0;
