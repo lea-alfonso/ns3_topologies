@@ -805,8 +805,8 @@ void nodeToNodeTrigger(Ptr<FlowMonitor> monitor)
 }
 
 // Assuming p2ph is your PointToPointHelper instance
-void ChangeDataRate(PointToPointHelper &p2p) {
-    p2p.SetDeviceAttribute("DataRate", StringValue("25Mbps"));
+void ChangeDataRate(PointToPointHelper &p2ph) {
+    p2ph.SetDeviceAttribute("DataRate", StringValue("100Gbps"));
 }
 
 void reportFlowStats(Ptr<FlowMonitor> monitor,Ptr<Ipv4FlowClassifier> classifier,std::string filename , std::ofstream& outFile){
