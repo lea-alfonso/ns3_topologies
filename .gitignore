@@ -8,7 +8,6 @@ rem-beam-example.cc
 cttc-channel-randomness.cc
 cttc-nr-mimo-demo.cc
 rem-example.cc
-CMakeLists.txt
 cttc-error-model-amc.cc
 cttc-nr-notching.cc
 second.cc
