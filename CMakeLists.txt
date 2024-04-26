@@ -2,6 +2,10 @@
 #
 # SPDX-License-Identifier: GPL-2.0-only
 
+find_library(TINYXML2_LIBRARY NAMES tinyxml2 REQUIRED)
+find_path(TINYXML2_INCLUDE_DIR NAMES tinyxml2.h REQUIRED)
+include_directories(${TINYXML2_INCLUDE_DIR})
+
 set(base_examples
     cttc-3gpp-channel-example
     cttc-3gpp-channel-simple-ran
@@ -26,7 +30,6 @@ set(base_examples
     cttc-nr-simple-qos-sched
     cttc-nr-multi-flow-qos-sched
     cttc-nr-mimo-demo
-    topology_1_3
     second_nr
 )
 foreach(
@@ -40,6 +43,14 @@ foreach(
                       ${libflow-monitor}
   )
 endforeach()
+
+build_lib_example(
+  NAME topology_1_3
+  SOURCE_FILES topology_1_3.cc
+  LIBRARIES_TO_LINK ${libnr}
+                    ${libflow-monitor}
+                    ${TINYXML2_LIBRARY}
+)
 
 if(NOT
    ${ENABLE_SQLITE}
