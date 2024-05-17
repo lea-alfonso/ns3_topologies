@@ -18,11 +18,11 @@
 // Network topology
 //
 //  n0(10.1.1.1)
-//     \ 5 Mb/s, 2ms
+//     \ 5 Mb/s, 4ms
 //      \          1.5Mb/s, 10ms
 //       n2 -------------------------n3 (10.1.3.1)
 //      /
-//     / 5 Mb/s, 2ms
+//     / 5 Mb/s, 4ms
 //   n1(10.1.2.1)
 //
 // - all links are point-to-point links with indicated one-way BW/delay
@@ -59,6 +59,16 @@ NS_LOG_COMPONENT_DEFINE("SimpleGlobalRoutingExample");
 
 bool compareByTime(const std::pair<uint32_t, ns3::Time>& a, const std::pair<uint32_t, ns3::Time>& b) {
     return a.second.Compare(b.second) < 0;
+}
+
+void ChangeLinkDelay(Ptr<NetDevice> device, Time newDelay) {
+    std::cout << Simulator::Now() <<" Changing link delay!" << std::endl;
+    Ptr<PointToPointChannel> p2pChannel = device->GetChannel()->GetObject<PointToPointChannel>();
+    if (p2pChannel) {
+        p2pChannel->SetAttribute("Delay", TimeValue(newDelay));
+    } else {
+        NS_LOG_ERROR("Failed to get PointToPointChannel object from the device.");
+    }
 }
 
 void nodeToNodeTrigger(Ptr<FlowMonitor> monitor)
@@ -338,7 +348,7 @@ main(int argc, char* argv[])
     NS_LOG_INFO("Create channels.");
     PointToPointHelper p2p;
     p2p.SetDeviceAttribute("DataRate", StringValue("100Gbps"));
-    p2p.SetChannelAttribute("Delay", StringValue("2ms"));
+    p2p.SetChannelAttribute("Delay", StringValue("4ms"));
     NetDeviceContainer d0d2 = p2p.Install(n0n2);
 
     NetDeviceContainer d1d2 = p2p.Install(n1n2);
@@ -346,6 +356,9 @@ main(int argc, char* argv[])
     p2p.SetDeviceAttribute("DataRate", StringValue("100Gbps"));
     p2p.SetChannelAttribute("Delay", StringValue("10ms"));
     NetDeviceContainer d3d2 = p2p.Install(n3n2);
+    // We schedule a change of delay in the link
+    Simulator::Schedule(Seconds(11), &ChangeLinkDelay, d3d2.Get(0), MilliSeconds(2));
+
 
     // Later, we add IP addresses.
     NS_LOG_INFO("Assign IP Addresses.");
