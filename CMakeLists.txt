@@ -51,6 +51,14 @@ build_lib_example(
                     ${libflow-monitor}
                     ${TINYXML2_LIBRARY}
 )
+build_lib_example(
+  NAME big-brother-tracker
+  SOURCE_FILES big-brother-tracker.cc
+  LIBRARIES_TO_LINK ${libnr}
+                    ${libflow-monitor}
+                    ${TINYXML2_LIBRARY}
+)
+    
 
 if(NOT
    ${ENABLE_SQLITE}

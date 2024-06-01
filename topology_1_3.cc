@@ -33,6 +33,7 @@
 #include "ns3/flow-monitor-helper.h"
 #include "ns3/flow-monitor.h"
 #include <fstream> 
+#include "big-brother-tracker.cc"
 #include <tinyxml2.h>
 using namespace tinyxml2;
 using namespace ns3;
@@ -45,29 +46,8 @@ using namespace ns3;
  *
  * $ export NS_LOG="CttcTrafficExample=level_info|prefix_func|prefix_time"
  */
+
 NS_LOG_COMPONENT_DEFINE("CttcNrTrafficNgmnMixed");
-
-
-struct TrackedStats {
-    ns3::Time throughput; // Threshold for throughput
-    ns3::Time meanDelay; // Threshold for mean delay
-    ns3::Time lastPacketDelay; // Threshold for last packet delay
-    ns3::Time meanJitter; // Threshold for mean jitter
-
-    // Constructor to initialize the thresholds
-    TrackedStats(ns3::Time throughput, ns3::Time meanDelay, ns3::Time lastPacketDelay, ns3::Time meanJitter)
-        : throughput(throughput),
-          meanDelay(meanDelay),
-          lastPacketDelay(lastPacketDelay),
-          meanJitter(meanJitter) {}
-};
-
-// TrackedStats thresholds(100.0, 10.0, 5.0, 2.0); // Example threshold values
-
-//TrackedStats lastMeasurment(100.0, 10.0, 5.0, 2.0); // Example last measurment
-
-
-
 
 class RadioNetworkParametersHelper
 {
@@ -673,6 +653,7 @@ operator<<(std::ostream& os, const TrafficTypeConf& item)
 }
 
 static inline std::istream&
+
 operator>>(std::istream& is, TrafficTypeConf& item)
 {
     uint32_t inputValue;
@@ -681,388 +662,9 @@ operator>>(std::istream& is, TrafficTypeConf& item)
     return is;
 }
 
-bool compareByTime(const std::pair<uint32_t, ns3::Time>& a, const std::pair<uint32_t, ns3::Time>& b) {
-    return a.second.Compare(b.second) < 0;
-}
-
-void nodeToNodeTrigger(Ptr<FlowMonitor> monitor,XMLDocument& measurments_doc)
-// This function implements the first step in looking for the cause of a bad metric
-// Given a flow_id, we look for the worst performing FlowProbes
-{
-    FlowMonitor::FlowStatsContainer stats = monitor->GetFlowStats();
-    FlowMonitor::FlowProbeContainer probes = monitor->GetAllProbes();
-    std::map<std::pair<uint32_t,uint32_t>,ns3::Time> nodeToNodeDelay;
-
-    // Get the root element
-    XMLElement* root = measurments_doc.FirstChildElement("network-measurements");
-    if (!root) {
-        // Create the root element if it doesn't exist
-        root = measurments_doc.NewElement("network-measurements");
-        measurments_doc.InsertEndChild(root);
-    }
-
-    XMLElement* delaysElement = root->FirstChildElement("delays");
-    if (!delaysElement) {
-        // Create the 'delays' element if it doesn't exist
-        delaysElement = measurments_doc.NewElement("delays");
-        root->InsertEndChild(delaysElement);
-    }
-
-    for (FlowMonitor::FlowStatsContainer::const_iterator flowStatsIt = stats.begin();
-        flowStatsIt != stats.end();
-        ++flowStatsIt)
-    {
-        FlowId flowId = flowStatsIt->first;  
-        std::map<uint32_t,std::vector<std::pair<uint32_t,ns3::Time>>> perPacketStats;
-
-        uint32_t maxPacketId = flowStatsIt->second.rxPackets;
-        for (uint32_t packetId = 0; packetId < maxPacketId; ++packetId)
-        {
-            std::map<uint32_t,FlowProbe::FlowStats> nodeProbeStats;
-            for (ns3::Ptr<ns3::FlowProbe> probe : probes)
-            {
-                FlowProbe::Stats probeStats = probe->GetStats();
-                Ptr<BigBrotherFlowProbe> bigBrotherProbe = DynamicCast<BigBrotherFlowProbe>(probe);
-                // We only work measure in the probes that are ipv4/bigBrother
-                if (bigBrotherProbe)
-                {
-                    std::map<std::pair<uint32_t,uint32_t>, FlowProbe::FlowStats>::const_iterator it = bigBrotherProbe->m_perPacketStats.find(std::make_pair(flowId, packetId));
-                    if (it != bigBrotherProbe->m_perPacketStats.end())
-                    {
-                        FlowProbe::FlowStats flowProbeStats = it->second;
-                        std::map<uint32_t,std::vector<std::pair<uint32_t,ns3::Time>>>::iterator perPacketStatsIt = perPacketStats.find(packetId);
-                        std::vector<std::pair<uint32_t,ns3::Time>> nodeAcc;
-                        if (perPacketStatsIt != perPacketStats.end())
-                        {
-                            nodeAcc = perPacketStatsIt->second;
-                        }
-                        nodeAcc.push_back(std::make_pair(bigBrotherProbe->m_nodeId,flowProbeStats.delayFromFirstProbeSum));
-                        try 
-                        {
-                            perPacketStats.insert_or_assign(packetId, nodeAcc);
-                        } catch (const std::exception& e)
-                        {
-                            std::cerr << "Error inserting into perPacketStats: " << e.what() << std::endl;
-                        }
-                    }
-
-                } 
-            }
-        
-        }
-        for(std::map<uint32_t,std::vector<std::pair<uint32_t,ns3::Time>>>::const_iterator it = perPacketStats.begin(); it != perPacketStats.end(); ++it)
-        {   
-            std::vector<std::pair<uint32_t,ns3::Time>> nodesDelay = it->second;
-            std::sort(nodesDelay.begin(), nodesDelay.end(), compareByTime);
-            for(size_t i = 0; i < nodesDelay.size() - 1;++i)
-            {
-                // We insert the pairs with the lesser nodeId first, and the delay of the second
-                uint32_t firstNode;
-                uint32_t secondNode;
-                if (nodesDelay[i].first < nodesDelay[i+1].first)
-                {
-                    firstNode = nodesDelay[i].first ;
-                    secondNode = nodesDelay[i+1].first ;
-                } else 
-                {
-                    firstNode = nodesDelay[i+1].first ;
-                    secondNode = nodesDelay[i].first ;
-                }
-                std::map<std::pair<uint32_t,uint32_t>,ns3::Time>::const_iterator findIt = nodeToNodeDelay.find(std::make_pair(firstNode,secondNode));
-                ns3::Time delayAcc;
-                if (findIt != nodeToNodeDelay.end())
-                {
-                    delayAcc = findIt->second;
-                }
-                //The measure of delay to every node-to-node metric, is the avg for every package
-                delayAcc += (nodesDelay[i+1].second - nodesDelay[i].second)/maxPacketId;
-                nodeToNodeDelay.insert_or_assign(std::make_pair(firstNode,secondNode),delayAcc );
-            }
-        }
-    }
-    std::cout << "Per node-to-node delays:" << std::endl;
-    ns3::Time maxDelay;
-    std::pair<uint32_t,uint32_t> maxDelayIndex;
-    XMLElement* maxDelayValueElement;
-    XMLElement* maxTimestampElement;
-    XMLElement* maxNodePairElement;
-    
-    for(std::map<std::pair<uint32_t,uint32_t>,ns3::Time>::iterator nodeToNodeDelayIt = nodeToNodeDelay.begin();nodeToNodeDelayIt != nodeToNodeDelay.end() ; ++nodeToNodeDelayIt)
-    {
-        std::cout<< "("<< nodeToNodeDelayIt->first.first << "," << nodeToNodeDelayIt->first.second << ") -> " << nodeToNodeDelayIt->second << std::endl;
-        // Check if the 'delay' element for this node pair already exists
-        XMLElement* delayElement = delaysElement->FirstChildElement("delay");
-        while (delayElement) {
-            XMLElement* nodePairElement = delayElement->FirstChildElement("node-pair");
-            if (nodePairElement) {
-                uint32_t nodeId1 = std::stoul(nodePairElement->FirstChildElement("node-id")->GetText());
-                uint32_t nodeId2 = std::stoul(nodePairElement->LastChildElement("node-id")->GetText());
-                if (nodeId1 == nodeToNodeDelayIt->first.first && nodeId2 == nodeToNodeDelayIt->first.second) {
-                    // The 'delay' element for this node pair already exists, append the new measurement
-                    break;
-                }
-            }
-            delayElement = delayElement->NextSiblingElement("delay");
-        }
-
-        if (!delayElement) {
-            // The 'delay' element for this node pair doesn't exist, create a new one
-            delayElement = measurments_doc.NewElement("delay");
-            delaysElement->InsertEndChild(delayElement);
-
-            // Create the 'node-pair' element
-            XMLElement* nodePairElement = measurments_doc.NewElement("node-pair");
-            delayElement->InsertEndChild(nodePairElement);
-
-            // Add the node IDs
-            XMLElement* nodeIdElement1 = measurments_doc.NewElement("node-id");
-            nodeIdElement1->InsertEndChild(measurments_doc.NewText(std::to_string(nodeToNodeDelayIt->first.first).c_str()));
-            nodePairElement->InsertEndChild(nodeIdElement1);
-
-            XMLElement* nodeIdElement2 = measurments_doc.NewElement("node-id");
-            nodeIdElement2->InsertEndChild(measurments_doc.NewText(std::to_string(nodeToNodeDelayIt->first.second).c_str()));
-            nodePairElement->InsertEndChild(nodeIdElement2);
-        }
-
-        // Create the 'measurements' element
-        XMLElement* measurementsElement = delayElement->FirstChildElement("measurements");
-        if (!measurementsElement) {
-            measurementsElement = measurments_doc.NewElement("measurements");
-            delayElement->InsertEndChild(measurementsElement);
-        }
-
-        // Create the 'measurement' element
-        XMLElement* measurementElement = measurments_doc.NewElement("measurement");
-        measurementsElement->InsertEndChild(measurementElement);
-
-        // Add the delay value and timestamp
-        XMLElement* delayValueElement = measurments_doc.NewElement("delay-value");
-        delayValueElement->InsertEndChild(measurments_doc.NewText(std::to_string(nodeToNodeDelayIt->second.GetNanoSeconds()).c_str()));
-        measurementElement->InsertEndChild(delayValueElement);
-
-        XMLElement* timestampElement = measurments_doc.NewElement("timestamp");
-        timestampElement->InsertEndChild(measurments_doc.NewText(std::to_string(Simulator::Now().GetNanoSeconds()).c_str()));
-        measurementElement->InsertEndChild(timestampElement);
-
-        if (nodeToNodeDelayIt->second > maxDelay)
-        {
-            maxDelay = nodeToNodeDelayIt->second;
-            maxDelayIndex = nodeToNodeDelayIt->first;
-        }
-
-    }
-
-    XMLElement* worstLinksElement = root->FirstChildElement("worst-links");
-    if (!worstLinksElement) {
-        worstLinksElement = measurments_doc.NewElement("worst-links");
-        root->InsertFirstChild(worstLinksElement);
-    }
-    
-    XMLElement* worstLinkElement = measurments_doc.NewElement("worst-link");
-
-    // Add the delay value 
-    XMLElement* delayValueElement = measurments_doc.NewElement("delay-value");
-    delayValueElement->InsertEndChild(measurments_doc.NewText(std::to_string(maxDelay.GetNanoSeconds()).c_str()));
-    worstLinkElement->InsertEndChild(delayValueElement);
-    // Add the timestamp
-    XMLElement* timestampElement = measurments_doc.NewElement("timestamp");
-    timestampElement->InsertEndChild(measurments_doc.NewText(std::to_string(Simulator::Now().GetNanoSeconds()).c_str()));
-    worstLinkElement->InsertEndChild(timestampElement);
-
-    // Create the 'node-pair' element
-    XMLElement* nodePairElement = measurments_doc.NewElement("node-pair");
-
-    // Add the node IDs
-    XMLElement* nodeIdElement1 = measurments_doc.NewElement("node-id");
-    nodeIdElement1->InsertEndChild(measurments_doc.NewText(std::to_string(maxDelayIndex.first).c_str()));
-    nodePairElement->InsertEndChild(nodeIdElement1);
-
-    XMLElement* nodeIdElement2 = measurments_doc.NewElement("node-id");
-    nodeIdElement2->InsertEndChild(measurments_doc.NewText(std::to_string(maxDelayIndex.second).c_str()));
-    nodePairElement->InsertEndChild(nodeIdElement2);
-    worstLinkElement->InsertEndChild(nodePairElement);
-     
-    worstLinksElement->InsertEndChild(worstLinkElement);
-    std::cout << Simulator::Now() <<"The bottle neck link is:" << "("<< maxDelayIndex.first << ", " << maxDelayIndex.second << ") " << "with a delay of " << maxDelay << std::endl;
-
-}
-
-// Assuming p2ph is your PointToPointHelper instance
-void ChangeDataRate(Ptr<PointToPointNetDevice> device1, Ptr<PointToPointNetDevice> device2) {
-    // Change the data rate of both devices to 3Mbps
-    device1->SetDataRate(DataRate("30Mb/s"));
-    device2->SetDataRate(DataRate("30Mb/s"));
-}
-
-void reportFlowStats(Ptr<FlowMonitor> monitor,Ptr<Ipv4FlowClassifier> classifier,std::string filename , std::ofstream& outFile ){
-
-    std::cout << "Report flow stats " << std::endl;
-    //throughput*, meanDelay, lastPacketDelay*, meanJitter* 
-    //TrackedStats variableName(double throughput, double meanDelay, double lastPacketDelay, double meanJitter);
-    TrackedStats measurements(Seconds(0), Seconds(0), Seconds(0), Seconds(0));
-    TrackedStats thresholds(Seconds(0), Seconds(0), Seconds(0), Seconds(0));
-
-    ns3::Time NETWORK_OK_MEASURING_TIME = MilliSeconds(50);
-    ns3::Time NETWORK_NOT_OK_MEASURING_TIME = MilliSeconds(25);
-
-    FlowMonitor::FlowStatsContainer stats = monitor->GetFlowStats();
-    // Redefining because we're prototyping
-    Time simTime = MilliSeconds(1400);
-    Time appStartTime = MilliSeconds(400);
-    double averageFlowThroughput = 0.0;
-    double averageFlowDelay = 0.0;
-
-    double delayValues[stats.size()];
-    uint64_t cont = 0;
-    XMLDocument measurments_doc;
-    measurments_doc.LoadFile("/home/leandro/Scripts/ns-3-dev/node_to_node_delays.xml");
-
-    outFile.open(filename.c_str(), std::ofstream::out | std::ofstream::app);
-    if (!outFile.is_open())
-    {
-        std::cerr << "Can't open file " << filename << std::endl;
-    }
-
-    outFile.setf(std::ios_base::fixed);
-
-    for (std::map<FlowId, FlowMonitor::FlowStats>::const_iterator i = stats.begin();
-         i != stats.end();
-         ++i)
-    {
-        Ipv4FlowClassifier::FiveTuple t = classifier->FindFlow(i->first);
-        std::stringstream protoStream;
-        protoStream << (uint16_t)t.protocol;
-        if (t.protocol == 6)
-        {
-            protoStream.str("TCP");
-        }
-        if (t.protocol == 17)
-        {
-            protoStream.str("UDP");
-        }
-        // std::cout << "Flow " << i->first << " (" << t.sourceAddress << ":" << t.sourcePort << " -> "
-        //           << t.destinationAddress << ":" << t.destinationPort << ") proto "
-        //           << protoStream.str() << "\n";
-        // std::cout << "  Tx Packets: " << i->second.txPackets << "\n";
-        // std::cout << "  Tx Bytes:   " << i->second.txBytes << "\n";
-        // std::cout << "  TxOffered:  "
-        //           << i->second.txBytes * 8.0 / (simTime - appStartTime).GetSeconds() / 1000.0 /
-        //                  1000.0
-        //           << " Mbps\n";
-        // std::cout << "  Rx Packets: " << i->second.rxPackets << "\n";
-        // std::cout << "  Rx Bytes:   " << i->second.rxBytes << "\n";
-
-        if (i->second.rxPackets > 0)
-        {
-            // Measure the duration of the flow from receiver's perspective
-            // double rxDuration = i->second.timeLastRxPacket.GetSeconds () -
-            // i->second.timeFirstTxPacket.GetSeconds ();
-            double rxDuration = (simTime - appStartTime).GetSeconds();
-
-            averageFlowThroughput += i->second.rxBytes * 8.0 / rxDuration / 1000 / 1000;
-            averageFlowDelay += 1000 * i->second.delaySum.GetSeconds() / i->second.rxPackets;
-            delayValues[cont] = 1000 * i->second.delaySum.GetSeconds() / i->second.rxPackets;
-            cont++;
-
-            //measurements.throughput = i->second.rxBytes * 8.0 / rxDuration / 1000 / 1000;
-            measurements.throughput = Time(Seconds(i->second.rxBytes * 8.0 / rxDuration / 1000 / 1000));
-
-            //measurements.meanDelay = double(1000 * i->second.delaySum.GetSeconds()) / (i->second.rxPackets);
-            measurements.meanDelay = MilliSeconds(double(1000 * i->second.delaySum.GetSeconds()) / i->second.rxPackets);
-
-            //measurements.lastPacketDelay = i->second.lastDelay.As(Time::MS);
-            measurements.lastPacketDelay = MilliSeconds(i->second.lastDelay.GetMilliSeconds());
-
-            //measurements.meanJitter = 1000 * i->second.jitterSum.GetSeconds() / i->second.rxPackets;
-            measurements.meanJitter = MilliSeconds(1000 * i->second.jitterSum.GetSeconds() / i->second.rxPackets);
-
-
-                std::cout << "  Throughput_Old: " << i->second.rxBytes * 8.0 / rxDuration / 1000 / 1000
-                        << " Mbps\n";
-
-                std::cout << "  Throughput_New: " << measurements.throughput
-                        << " Mbps\n";
-
-                std::cout << "  Mean delay_Old:  "
-                        << double(1000 * i->second.delaySum.GetSeconds()) / (i->second.rxPackets) 
-                        << " ms\n";
-
-                std::cout << "  Mean delay_New:  "
-                        << measurements.meanDelay 
-                        << " ms\n";
-
-                std::cout << "  Last packet delay_Old: " << MilliSeconds(i->second.lastDelay.GetMilliSeconds()) << " ms\n";
-                std::cout << "  Last packet delay_New: " << measurements.lastPacketDelay << " ms\n";
-
-                // std::cout << "  Mean upt:  " << i->second.uptSum / i->second.rxPackets / 1000/1000 <<
-                // " Mbps \n";
-
-                std::cout << "  Mean jitter_Old:  "
-                        << 1000 * i->second.jitterSum.GetSeconds() / i->second.rxPackets << " ms\n";
-
-                std::cout << "  Mean jitter_New:  "
-                        << measurements.meanJitter << " ms\n";
-
-            std::cout << "\n";
-            std::cout << "Measurements :" << "\n";
-            std::cout << "Measurements_Throughput : " << measurements.throughput << " Mbps\n";
-            std::cout << "Measurements_MeanDelay : " << measurements.meanDelay << " ms\n";
-            std::cout << "Measurements_LastPacketDelay : " << measurements.lastPacketDelay << " ms\n";
-            std::cout << "Measurements_MeanJitter : " << measurements.meanJitter << " ms\n";
-            std::cout << "\n";
-
-            outFile << Simulator::Now().GetMilliSeconds() << "\t" << measurements.throughput.GetMilliSeconds() << "\t" << measurements.meanDelay.GetMilliSeconds() << "\t" << measurements.lastPacketDelay.GetMilliSeconds() << "\t" << measurements.meanJitter.GetMilliSeconds() << "\n";
-        } else
-        {
-            outFile << "  Throughput:  0 Mbps\n";
-            outFile << "  Mean delay:  0 ms\n";
-            outFile << "  Mean jitter: 0 ms\n";
-            outFile << "  Rx Packets: " << i->second.rxPackets << "\n";
-        }
-    }
-    std::sort(delayValues, delayValues + stats.size());
-    // for (uint32_t i = 0; i < stats.size(); i++)
-    //   {
-    //     std::cout << delayValues[i] << " ";
-    //   }
-    // double FiftyTileFlowDelay = (delayValues[stats.size()/2] + delayValues[stats.size()/2 -1])/2;
-    double FiftyTileFlowDelay = delayValues[stats.size() / 2];
-
-    // outFile << "\n\n  Mean flow throughput: " << averageFlowThroughput / stats.size() << "\n";
-    // outFile << "  Mean flow delay: " << averageFlowDelay / stats.size() << "\n";
-    // outFile << "  Median flow delay: " << FiftyTileFlowDelay << "\n";
-
-
-    outFile.close();
-
-    std::ifstream f(filename.c_str());
-
-
-    ns3::Time MEASURING_TIME; 
-    if(
-        measurements.throughput > thresholds.throughput || 
-        measurements.meanDelay > thresholds.meanDelay || 
-        measurements.lastPacketDelay > thresholds.lastPacketDelay || 
-        measurements.meanJitter > thresholds.meanJitter
-    ){
-        MEASURING_TIME = NETWORK_NOT_OK_MEASURING_TIME;
-        // TODO: include the reportNodeToNode function invokation here
-    } 
-    else{
-
-        MEASURING_TIME = NETWORK_OK_MEASURING_TIME;
-    }
-    nodeToNodeTrigger(monitor,measurments_doc);
-    measurments_doc.SaveFile("/home/leandro/Scripts/ns-3-dev/node_to_node_delays.xml");
-    monitor->ResetAllStats();
-    Simulator::Schedule(MEASURING_TIME, &reportFlowStats, monitor, classifier, filename, std::ref(outFile));
-}
-
 int
 main(int argc, char* argv[])
 {
-    XMLDocument doc;
-    doc.LoadFile( "/home/leandro/Scripts/ns-3-dev/node_to_node_delays.xml" );
     // Initialize FlowMonitor
     // Ptr<FlowMonitor> flowMonitor;
     // FlowMonitorHelper flowHelper;
@@ -1120,6 +722,8 @@ main(int argc, char* argv[])
     uint8_t ngmnMixedVoipPercentage = 30;
     uint8_t ngmnMixedGamingPercentage = 20;
 
+    std::string bottleNeckDelay =  "100ns";
+
     /*
      * From here, we instruct the ns3::CommandLine class of all the input parameters
      * that we may accept as input, as well as their description, and the storage
@@ -1154,6 +758,7 @@ main(int argc, char* argv[])
                  "tag to be appended to output filenames to distinguish simulation campaigns",
                  simTag);
     cmd.AddValue("outputDir", "directory where to store simulation results", outputDir);
+    cmd.AddValue("bottleNeckDelay", "delay to insert in the bottle neck", bottleNeckDelay);
 
     // Parse the command line
     cmd.Parse(argc, argv);
@@ -1340,42 +945,40 @@ main(int argc, char* argv[])
     intermediateNodes.Create(2); // Creating two intermediate nodes
     internet.Install(intermediateNodes);
 
-    // Connect pgw to the first intermediate node
+    // 33->37 Connect pgw to the first intermediate node
     PointToPointHelper p2ph;
     p2ph.SetDeviceAttribute("DataRate", DataRateValue(DataRate("100Gb/s")));
     p2ph.SetDeviceAttribute("Mtu", UintegerValue(2500));
-    p2ph.SetChannelAttribute("Delay", TimeValue(Seconds(0.000)));
+    p2ph.SetChannelAttribute("Delay", StringValue("0ns"));
     NodeContainer link1 = NodeContainer(pgw, intermediateNodes.Get(0));
     NetDeviceContainer link1Devices = p2ph.Install(link1);
+    ipv4h.SetBase("10.0.0.0", "255.255.255.0");
     Ipv4InterfaceContainer link1Interfaces = ipv4h.Assign(link1Devices);
 
-    // Configure the bottle neck
-    p2ph = PointToPointHelper();
-    p2ph.SetDeviceAttribute("DataRate", DataRateValue(DataRate("50Mb/s")));
-    p2ph.SetDeviceAttribute("Mtu", UintegerValue(2500));
-    p2ph.SetChannelAttribute("Delay", TimeValue(Seconds(0.000)));
-
-    // Connect the intermediate nodes
-    NodeContainer link2 = NodeContainer(intermediateNodes.Get(0), intermediateNodes.Get(1));
-    NetDeviceContainer link2Devices = p2ph.Install(link2);
-    Ipv4InterfaceContainer link2Interfaces = ipv4h.Assign(link2Devices);
-
-    // Configure the bottle neck
+    // 37 -> 38
     p2ph = PointToPointHelper();
     p2ph.SetDeviceAttribute("DataRate", DataRateValue(DataRate("100Gb/s")));
     p2ph.SetDeviceAttribute("Mtu", UintegerValue(2500));
-    p2ph.SetChannelAttribute("Delay", TimeValue(Seconds(0.000)));
+    p2ph.SetChannelAttribute("Delay", StringValue(bottleNeckDelay));
+
+    NodeContainer link2 = NodeContainer(intermediateNodes.Get(0), intermediateNodes.Get(1));
+    NetDeviceContainer link2Devices = p2ph.Install(link2);
+    ipv4h.SetBase("10.0.1.0", "255.255.255.0");
+    Ipv4InterfaceContainer link2Interfaces = ipv4h.Assign(link2Devices);
+
+    // 38 -> 36, second intermediateNode to remoteHost
+    p2ph = PointToPointHelper();
+    p2ph.SetDeviceAttribute("DataRate", DataRateValue(DataRate("100Gb/s")));
+    p2ph.SetDeviceAttribute("Mtu", UintegerValue(2500));
+    p2ph.SetChannelAttribute("Delay",StringValue("0ns"));
  
-    // Connect the second intermediate node to the remoteHost
     NodeContainer link3 = NodeContainer(intermediateNodes.Get(1), remoteHost);
     NetDeviceContainer link3Devices = p2ph.Install(link3);
-    // Get the devices
-    Ptr<PointToPointNetDevice> device1 = DynamicCast<PointToPointNetDevice>(link3Devices.Get(0));
-    Ptr<PointToPointNetDevice> device2 = DynamicCast<PointToPointNetDevice>(link3Devices.Get(1));
-
+    ipv4h.SetBase("10.0.2.0", "255.255.255.0");
     Ipv4InterfaceContainer link3Interfaces = ipv4h.Assign(link3Devices);
     Ipv4Address remoteHostAddr = link3Interfaces.GetAddress(1);
-    Simulator::Schedule(NanoSeconds(550000000), &ChangeDataRate, device1, device2);
+    // Simulator::Schedule(Seconds(11), &ChangeLinkDelay, d3d2.Get(0), MilliSeconds(2));
+
     // Configure routing
     Ptr<Ipv4StaticRouting> pgwStaticRouting = ipv4RoutingHelper.GetStaticRouting(pgw->GetObject<Ipv4>());
     // We connect pgw to intermediate_node_1
@@ -1697,7 +1300,6 @@ main(int argc, char* argv[])
                 // Seed the ARP cache by pinging early in the simulation
                 // This is a workaround until a static ARP capability is provided
                 PingHelper ping(ipAddress);
-                pingApps.Add(ping.Install(remoteHostContainer));
                 pingApps.Add(ping.Install(remoteHostContainer));
             }
             // configure clients on sector 2
@@ -2169,7 +1771,6 @@ main(int argc, char* argv[])
                 continue;
             }
 
-            Ipv4Address ipAddress = ueSector2IpIface.GetAddress(i, 0);
         }
         // configure clients on sector 3
         for (uint32_t i = 0; i < ueSector3IpIface.GetN(); i++)
@@ -2317,18 +1918,12 @@ main(int argc, char* argv[])
     flowMonitor->SetAttribute("PacketSizeBinWidth", DoubleValue(20));
     std::string filename = outputDir + "/" + simTag;
 
-    Simulator::Stop(simTime);
     flowMonitor->CheckForLostPackets();
     Ptr<Ipv4FlowClassifier> classifier =
         DynamicCast<Ipv4FlowClassifier>(flowmonHelper.GetClassifier());
-    std::ofstream traceOutFile;
+    Simulator::Schedule(MilliSeconds(1200),&reportFlowStats,flowMonitor,classifier,filename, true);
+    Simulator::Stop(simTime);
 
-    // We clean any previous measures_doc that could be present
-    XMLDocument measurments_doc; 
-    measurments_doc.SaveFile( "/home/leandro/Scripts/ns-3-dev/node_to_node_delays.xml" );
-
-
-    Simulator::Schedule(MilliSeconds(500),&reportFlowStats,flowMonitor,classifier,filename,std::ref(traceOutFile));
     Simulator::Run();
 
     Simulator::Destroy();
