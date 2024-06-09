@@ -26,6 +26,7 @@ public:
     // Container to map <FlowId, PacketId> -> map <NodeId, Stats>
     typedef std::map<std::pair<FlowId, uint32_t>, FlowProbe::FlowStats> PerPacketStats;
     PerPacketStats m_perPacketStats;
+    std::map<FlowId,uint32_t> m_packetStartIndex;
 
     BigBrotherFlowProbe(Ptr<FlowMonitor> monitor, Ptr<Ipv4FlowClassifier> classifier, Ptr<Node> node);
     ~BigBrotherFlowProbe() override;
@@ -36,8 +37,6 @@ public:
     /// Register this type.
     /// \return The TypeId.
     static TypeId GetTypeId();
-
-
 
 };
 

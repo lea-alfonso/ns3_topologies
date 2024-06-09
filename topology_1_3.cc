@@ -943,6 +943,8 @@ main(int argc, char* argv[])
     // Create additional nodes
     NodeContainer intermediateNodes;
     intermediateNodes.Create(2); // Creating two intermediate nodes
+    std::cout << "pgw -> in_1 -> in_2 -> remoteHost" << std::endl;
+    std::cout << pgw->GetId() <<"->" << intermediateNodes.Get(0)->GetId() << "->" << intermediateNodes.Get(1)->GetId() << "->" << remoteHost->GetId() << std::endl;
     internet.Install(intermediateNodes);
 
     // 33->37 Connect pgw to the first intermediate node
@@ -966,6 +968,9 @@ main(int argc, char* argv[])
     ipv4h.SetBase("10.0.1.0", "255.255.255.0");
     Ipv4InterfaceContainer link2Interfaces = ipv4h.Assign(link2Devices);
 
+    // We schedule it to be the next bottleNeck 
+    Simulator::Schedule(MilliSeconds(1401), &ChangeLinkDelay, link1Devices.Get(0), MilliSeconds(9));
+
     // 38 -> 36, second intermediateNode to remoteHost
     p2ph = PointToPointHelper();
     p2ph.SetDeviceAttribute("DataRate", DataRateValue(DataRate("100Gb/s")));
@@ -977,7 +982,6 @@ main(int argc, char* argv[])
     ipv4h.SetBase("10.0.2.0", "255.255.255.0");
     Ipv4InterfaceContainer link3Interfaces = ipv4h.Assign(link3Devices);
     Ipv4Address remoteHostAddr = link3Interfaces.GetAddress(1);
-    // Simulator::Schedule(Seconds(11), &ChangeLinkDelay, d3d2.Get(0), MilliSeconds(2));
 
     // Configure routing
     Ptr<Ipv4StaticRouting> pgwStaticRouting = ipv4RoutingHelper.GetStaticRouting(pgw->GetObject<Ipv4>());
@@ -1921,7 +1925,8 @@ main(int argc, char* argv[])
     flowMonitor->CheckForLostPackets();
     Ptr<Ipv4FlowClassifier> classifier =
         DynamicCast<Ipv4FlowClassifier>(flowmonHelper.GetClassifier());
-    Simulator::Schedule(MilliSeconds(1200),&reportFlowStats,flowMonitor,classifier,filename, true);
+    Simulator::Schedule(MilliSeconds(1400),&reportFlowStats,flowMonitor,classifier,filename, true);
+    Simulator::Schedule(MilliSeconds(2400),&reportFlowStats,flowMonitor,classifier,filename, false);
     Simulator::Stop(simTime);
 
     Simulator::Run();

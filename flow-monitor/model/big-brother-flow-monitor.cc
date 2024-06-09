@@ -537,9 +537,14 @@ FlowMonitor::ResetAllStats()
 {
     NS_LOG_FUNCTION(this);
 
+    FlowMonitor::FlowProbeContainer probes = this->GetAllProbes() ;
+    std::map<FlowId,uint32_t> startIndex;
     for (auto& iter : m_flowStats)
     {
         auto& flowStat = iter.second;
+
+        startIndex.emplace(std::make_pair(iter.first,flowStat.rxPackets + 1));
+
         flowStat.delaySum = Seconds(0);
         flowStat.jitterSum = Seconds(0);
         flowStat.lastDelay = Seconds(0);
@@ -556,6 +561,25 @@ FlowMonitor::ResetAllStats()
         flowStat.jitterHistogram.Clear();
         flowStat.packetSizeHistogram.Clear();
         flowStat.flowInterruptionsHistogram.Clear();
+    }
+    // We now clear all our traces of big-brother-probes:
+    for (ns3::Ptr<ns3::FlowProbe> probe : probes)
+    {
+        Ptr<BigBrotherFlowProbe> bigBrotherProbe = DynamicCast<BigBrotherFlowProbe>(probe);
+        // We only measure in the probes that are ipv4/bigBrother
+        if (bigBrotherProbe)
+        {
+            bigBrotherProbe->m_perPacketStats.clear();
+            for (std::map<FlowId,uint32_t>::iterator it = bigBrotherProbe->m_packetStartIndex.begin(); it !=bigBrotherProbe->m_packetStartIndex.end(); it++ ){
+                std::map<FlowId,uint32_t>::const_iterator indexIt = startIndex.find(it->first);
+                if (indexIt != startIndex.end()) {
+                    it->second = indexIt->second;
+                } else {
+                    std::cerr << "You fucked up along the way" << std::endl;
+                }
+                
+            }
+        }
     }
 }
 

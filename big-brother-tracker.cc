@@ -13,8 +13,9 @@ using namespace tinyxml2;
 
 using namespace ns3;
 
-ns3::Time NETWORK_OK_MEASURING_TIME = MilliSeconds(50);
-ns3::Time NETWORK_NOT_OK_MEASURING_TIME = MilliSeconds(50);
+ns3::Time NETWORK_OK_MEASURING_TIME = MilliSeconds(100);
+ns3::Time NETWORK_NOT_OK_MEASURING_TIME = MilliSeconds(100);
+ns3::Time MEASURING_TIME = MilliSeconds(100);
 
 struct TrackedStats {
     double throughput; // Threshold for throughput
@@ -39,8 +40,56 @@ bool compareByTime(const std::pair<uint32_t, ns3::Time>& a, const std::pair<uint
     return a.second.Compare(b.second) < 0;
 }
 
+bool IsFlowStatsEmpty(const FlowId flowId, const FlowMonitor::FlowStats& flowStat)
+{
+    // if (flowStat.delaySum != Seconds(0)) {
+    //     std::cout << "Flow id: "<< flowId << "delaySum is not zero\n";
+    // }
+    // if (flowStat.jitterSum != Seconds(0)) {
+    //     std::cout<< "Flow id: "<< flowId << "jitterSum is not zero\n";
+    // }
+    // if (flowStat.lastDelay != Seconds(0)) {
+    //     std::cout<< "Flow id: "<< flowId << "lastDelay is not zero\n";
+    // }
+    // if (flowStat.txBytes != 0) {
+    //     std::cout<< "Flow id: "<< flowId << "txBytes is not zero\n";
+    // }
+    // if (flowStat.rxBytes != 0) {
+    //     std::cout<< "Flow id: "<< flowId << "rxBytes is not zero\n";
+    // }
+    // if (flowStat.txPackets != 0) {
+    //     std::cout<< "Flow id: "<< flowId << "txPackets is not zero\n";
+    // }
+    // if (flowStat.rxPackets != 0) {
+    //     std::cout<< "Flow id: "<< flowId << "rxPackets is not zero\n";
+    // }
+    // if (flowStat.lostPackets != 0) {
+    //     std::cout<< "Flow id: "<< flowId << "lostPackets is not zero\n";
+    // }
+    // if (flowStat.timesForwarded != 0) {
+    //     std::cout<< "Flow id: "<< flowId << "timesForwarded is not zero\n";
+    // }
+    // if (!flowStat.bytesDropped.empty()) {
+    //     std::cout<< "Flow id: "<< flowId << "bytesDropped is not empty\n";
+    // }
+    // if (!flowStat.packetsDropped.empty()) {
+    //     std::cout<< "Flow id: "<< flowId << "packetsDropped is not empty\n";
+    // }
+
+    return (flowStat.delaySum == Seconds(0) &&
+        flowStat.jitterSum == Seconds(0) &&
+        flowStat.lastDelay == Seconds(0) &&
+        flowStat.txBytes == 0 &&
+        flowStat.rxBytes == 0 &&
+        flowStat.txPackets == 0 &&
+        flowStat.rxPackets == 0 &&
+        flowStat.timesForwarded == 0 &&
+        flowStat.bytesDropped.empty() &&
+        flowStat.packetsDropped.empty());
+}
+
 void ChangeLinkDelay(Ptr<NetDevice> device, Time newDelay) {
-    std::cout << Simulator::Now() <<" Changing link delay!" << std::endl;
+    std::cout << Simulator::Now().As(Time::MS) <<" Changing link delay!" << std::endl;
     Ptr<PointToPointChannel> p2pChannel = device->GetChannel()->GetObject<PointToPointChannel>();
     if (p2pChannel) {
         p2pChannel->SetAttribute("Delay", TimeValue(newDelay));
@@ -49,8 +98,7 @@ void ChangeLinkDelay(Ptr<NetDevice> device, Time newDelay) {
     }
 }
 
-
-void nodeToNodeTrigger(Ptr<FlowMonitor> monitor, std::string node_to_node_doc_path)
+std::optional<std::pair<int64_t,int64_t>> nodeToNodeTrigger(Ptr<FlowMonitor> monitor, std::string node_to_node_doc_path)
 // This function implements the first step in looking for the cause of a bad metric
 // Given a flow_id, we look for the worst performing FlowProbes
 {
@@ -59,9 +107,9 @@ void nodeToNodeTrigger(Ptr<FlowMonitor> monitor, std::string node_to_node_doc_pa
     if (result != XML_SUCCESS && result != XML_ERROR_EMPTY_DOCUMENT) {
         // Handle error
         std::cerr << "Error loading file: " << measurements_doc.ErrorIDToName(result) << std::endl;
-        return;
+        return std::nullopt;
     } 
-    // --------
+
     FlowMonitor::FlowStatsContainer stats = monitor->GetFlowStats();
     FlowMonitor::FlowProbeContainer probes = monitor->GetAllProbes();
     std::map<std::pair<uint32_t,uint32_t>,ns3::Time> nodeToNodeDelay;
@@ -93,7 +141,6 @@ void nodeToNodeTrigger(Ptr<FlowMonitor> monitor, std::string node_to_node_doc_pa
         each node.  */
         std::map<uint32_t,std::vector<std::pair<uint32_t,ns3::Time>>> perPacketStats;
 
-        uint32_t maxPacketId = flowStatsIt->second.rxPackets;
         /* 
         For each packet sent(not necessarely recived) in the flow.We'll
             1- Access each probe involved in the flow
@@ -101,48 +148,53 @@ void nodeToNodeTrigger(Ptr<FlowMonitor> monitor, std::string node_to_node_doc_pa
             3- If it did, we'll extract the delay from the bigBrotherStats.
             4- Create an adequate entry for perPacketStats
         */
-        for (uint32_t packetId = 0; packetId < maxPacketId; ++packetId)
+        // Step 1
+        for (ns3::Ptr<ns3::FlowProbe> probe : probes)
         {
-            std::map<uint32_t,FlowProbe::FlowStats> nodeProbeStats;
-            // Step 1
-            for (ns3::Ptr<ns3::FlowProbe> probe : probes)
+            FlowProbe::Stats probeStats = probe->GetStats();
+            Ptr<BigBrotherFlowProbe> bigBrotherProbe = DynamicCast<BigBrotherFlowProbe>(probe);
+            // We only measure in the probes that are ipv4/bigBrother
+            if (bigBrotherProbe)
             {
-                FlowProbe::Stats probeStats = probe->GetStats();
-                Ptr<BigBrotherFlowProbe> bigBrotherProbe = DynamicCast<BigBrotherFlowProbe>(probe);
-                // We only measure in the probes that are ipv4/bigBrother
-                if (bigBrotherProbe)
-                {
-                    std::map<std::pair<uint32_t,uint32_t>, FlowProbe::FlowStats>::const_iterator it = bigBrotherProbe->m_perPacketStats.find(std::make_pair(flowId, packetId));
-                    // Step 2
-                    if (it != bigBrotherProbe->m_perPacketStats.end())
+                std::map<FlowId,uint32_t>::const_iterator it = bigBrotherProbe->m_packetStartIndex.find(flowId);
+                if (it != bigBrotherProbe->m_packetStartIndex.end()){
+                    uint32_t startIndex = it->second;
+                    for (uint32_t packetId = startIndex; packetId < startIndex + flowStatsIt->second.rxPackets; ++packetId)
                     {
-                        // Step 3
-                        FlowProbe::FlowStats flowProbeStats = it->second;
-                        // Now we'll insert the extracted delay to the corresponding packet id's entry's vector
-                        // While being carefull of creating this vector if it doesn't yet exist, and appending 
-                        // to it otherwise.
-                        std::map<uint32_t,std::vector<std::pair<uint32_t,ns3::Time>>>::iterator perPacketStatsIt = perPacketStats.find(packetId);
-                        std::vector<std::pair<uint32_t,ns3::Time>> nodeAcc;
-                        if (perPacketStatsIt != perPacketStats.end())
+                        std::map<std::pair<uint32_t,uint32_t>, FlowProbe::FlowStats>::const_iterator it = bigBrotherProbe->m_perPacketStats.find(std::make_pair(flowId, packetId));
+                        // Step 2
+                        if (it != bigBrotherProbe->m_perPacketStats.end())
                         {
-                            nodeAcc = perPacketStatsIt->second;
+                            // Step 3
+                            FlowProbe::FlowStats flowProbeStats = it->second;
+                            // Now we'll insert the extracted delay to the corresponding packet id's entry's vector
+                            // While being carefull of creating this vector if it doesn't yet exist, and appending 
+                            // to it otherwise.
+                            std::map<uint32_t,std::vector<std::pair<uint32_t,ns3::Time>>>::iterator perPacketStatsIt = perPacketStats.find(packetId);
+                            std::vector<std::pair<uint32_t,ns3::Time>> nodeAcc;
+                            if (perPacketStatsIt != perPacketStats.end())
+                            {
+                                nodeAcc = perPacketStatsIt->second;
+                            }
+                            // Observation: We're storing the delay from first probe of each node
+                            nodeAcc.push_back(std::make_pair(bigBrotherProbe->m_nodeId,flowProbeStats.delayFromFirstProbeSum));
+                            try 
+                            {
+                                // Step 4
+                                perPacketStats.insert_or_assign(packetId, nodeAcc);
+                            } catch (const std::exception& e)
+                            {
+                                std::cerr << "Error inserting into perPacketStats: " << e.what() << std::endl;
+                            }
                         }
-                        // Observation: We're storing the dealy from first probe of each node
-                        nodeAcc.push_back(std::make_pair(bigBrotherProbe->m_nodeId,flowProbeStats.delayFromFirstProbeSum));
-                        try 
-                        {
-                            // Step 4
-                            perPacketStats.insert_or_assign(packetId, nodeAcc);
-                        } catch (const std::exception& e)
-                        {
-                            std::cerr << "Error inserting into perPacketStats: " << e.what() << std::endl;
-                        }
-                    }
 
-                } 
+                    } 
+                }
             }
         
         }
+
+        // packetId -> vector of (node,delay)
         for(std::map<uint32_t,std::vector<std::pair<uint32_t,ns3::Time>>>::const_iterator it = perPacketStats.begin(); it != perPacketStats.end(); ++it)
         {   
             std::vector<std::pair<uint32_t,ns3::Time>> nodesDelay = it->second;
@@ -168,6 +220,7 @@ void nodeToNodeTrigger(Ptr<FlowMonitor> monitor, std::string node_to_node_doc_pa
                     delayAcc = findIt->second;
                 }
                 //TODO: Maybe worth rethinking this shit innit?
+                // This would override if another packet from whichever flow, had passed between those nodes before
                 //The measure of delay to every node-to-node metric, is the avg for every package
                 delayAcc = (nodesDelay[i+1].second - nodesDelay[i].second); 
                 // delayAcc += (nodesDelay[i+1].second - nodesDelay[i].second)/maxPacketId;
@@ -181,7 +234,6 @@ void nodeToNodeTrigger(Ptr<FlowMonitor> monitor, std::string node_to_node_doc_pa
     
     for(std::map<std::pair<uint32_t,uint32_t>,ns3::Time>::iterator nodeToNodeDelayIt = nodeToNodeDelay.begin();nodeToNodeDelayIt != nodeToNodeDelay.end() ; ++nodeToNodeDelayIt)
     {
-        // std::cout<< "("<< nodeToNodeDelayIt->first.first << "," << nodeToNodeDelayIt->first.second << ") -> " << nodeToNodeDelayIt->second << std::endl;
         // Check if the 'delay' element for this node pair already exists
         XMLElement* delayElement = delaysElement->FirstChildElement("delay");
         while (delayElement) {
@@ -275,9 +327,13 @@ void nodeToNodeTrigger(Ptr<FlowMonitor> monitor, std::string node_to_node_doc_pa
     worstLinkElement->InsertEndChild(nodePairElement);
      
     worstLinksElement->InsertEndChild(worstLinkElement);
-    // std::cout << Simulator::Now() <<"The bottle neck link is:" << "("<< maxDelayIndex.first << ", " << maxDelayIndex.second << ") " << "with a delay of " << maxDelay << std::endl;
 
     measurements_doc.SaveFile(node_to_node_doc_path.c_str());
+
+    return std::make_pair(maxDelayIndex.first,maxDelayIndex.second);
+}
+void nodeToNodeTriggerVoidWrapper(Ptr<FlowMonitor> monitor, std::string node_to_node_doc_path) {
+    nodeToNodeTrigger(monitor,node_to_node_doc_path);
 }
 
 void reportFlowStats(Ptr<FlowMonitor> monitor,Ptr<Ipv4FlowClassifier> classifier,std::string filename, bool newFiles){
@@ -306,9 +362,11 @@ void reportFlowStats(Ptr<FlowMonitor> monitor,Ptr<Ipv4FlowClassifier> classifier
     }
     outFile.setf(std::ios_base::fixed);
 
+    monitor->CheckForLostPackets(MilliSeconds(300));
 
     TrackedStats measurements(0, Seconds(0), Seconds(0), Seconds(0), 0, Seconds(0),Seconds(0));
-    TrackedStats thresholds(0, Seconds(0), Seconds(0), Seconds(0), 0, Seconds(0),Seconds(0));
+    // TrackedStats(float throughput, ns3::Time meanDelay, ns3::Time lastPacketDelay, ns3::Time meanJitter, double flowsAverageThroughput, Time flowsAverageDelay, Time delayValuesMedian)
+    TrackedStats thresholds( 0.06, Seconds(1.0044), Seconds(0), Seconds(0), 0.055, Seconds(0.00419),Seconds(0));
     double averageFlowThroughput = 0.0;
     double averageFlowDelay = 0.0;
     FlowMonitor::FlowStatsContainer stats = monitor->GetFlowStats();
@@ -319,12 +377,13 @@ void reportFlowStats(Ptr<FlowMonitor> monitor,Ptr<Ipv4FlowClassifier> classifier
     Time simTime = MilliSeconds(1400);
     Time appStartTime = MilliSeconds(400);
     
-    outFile << "Report flow stats " << Simulator::Now() << std::endl;
+    outFile << "Report flow stats " << Simulator::Now().As(Time::MS) << ", Current measuring time " << MEASURING_TIME << std::endl;
 
     for (std::map<FlowId, FlowMonitor::FlowStats>::const_iterator i = stats.begin();
          i != stats.end();
          ++i)
     {
+        if (!IsFlowStatsEmpty(i->first,i->second)) {
         Ipv4FlowClassifier::FiveTuple t = classifier->FindFlow(i->first);
         std::stringstream protoStream;
         protoStream << (uint16_t)t.protocol;
@@ -352,23 +411,33 @@ void reportFlowStats(Ptr<FlowMonitor> monitor,Ptr<Ipv4FlowClassifier> classifier
         measurements.lastPacketDelay = i->second.lastDelay;
         if (i->second.rxPackets > 0)
         {
-            // Measure the duration of the flow from receiver's perspective
-            double rxDuration = (simTime - appStartTime).GetSeconds();
+                // Measure the duration of the flow from receiver's perspective
+                double rxDuration = (simTime - appStartTime).GetSeconds();
 
-            averageFlowThroughput += i->second.rxBytes * 8.0 / rxDuration / 1000 / 1000;
-            averageFlowDelay += i->second.delaySum.GetSeconds() / i->second.rxPackets;
-            delayValues[cont] = i->second.delaySum.GetSeconds() / i->second.rxPackets;
-            cont++;
-            // In Mbps
-            measurements.throughput = i->second.rxBytes * 8.0 / rxDuration / 1000 / 1000;
-            measurements.meanDelay = Seconds( i->second.delaySum.GetSeconds() / i->second.rxPackets);
-            measurements.meanJitter = Seconds(i->second.jitterSum.GetSeconds() / i->second.rxPackets);
-        } 
-        
-        outFile << "\t\tThroughput: " << measurements.throughput << " Mbps\n";
-        outFile << "\t\tMean delay: "<< measurements.meanDelay.As(Time::MS) << " \n";
-        outFile << "\t\tLast packet delay: " << measurements.lastPacketDelay.As(Time::MS) << " \n";
-        outFile << "\t\tMean jitter: " << measurements.meanJitter.As(Time::MS) << "\n";
+                averageFlowThroughput += i->second.rxBytes * 8.0 / rxDuration / 1000 / 1000;
+                averageFlowDelay += i->second.delaySum.GetSeconds() / i->second.rxPackets;
+                delayValues[cont] = i->second.delaySum.GetSeconds() / i->second.rxPackets;
+                cont++;
+                // In Mbps
+                measurements.throughput = i->second.rxBytes * 8.0 / rxDuration / 1000 / 1000;
+                measurements.meanDelay = Seconds( i->second.delaySum.GetSeconds() / i->second.rxPackets);
+                measurements.meanJitter = Seconds(i->second.jitterSum.GetSeconds() / i->second.rxPackets);
+            } 
+            
+            outFile << "\t\tThroughput: " << measurements.throughput << " Mbps\n";
+            outFile << "\t\tMean delay: "<< measurements.meanDelay.As(Time::MS) << " \n";
+            outFile << "\t\tLast packet delay: " << measurements.lastPacketDelay.As(Time::MS) << " \n";
+            outFile << "\t\tMean jitter: " << measurements.meanJitter.As(Time::MS) << "\n";
+
+            if(
+                measurements.throughput < thresholds.throughput || 
+                measurements.meanDelay > thresholds.meanDelay
+            ){
+                outFile << "\n\t Flow "<< i->first <<" surpassing threshold " << "\n";
+            } else{
+                outFile << "\n\t Flow "<< i->first <<" under threshold " << "\n";
+            }
+        }
     }
     std::sort(delayValues.begin(), delayValues.end());
     double delayValuesMedian = delayValues[stats.size() / 2];
@@ -381,29 +450,29 @@ void reportFlowStats(Ptr<FlowMonitor> monitor,Ptr<Ipv4FlowClassifier> classifier
     outFile << "\n\n\tMean flow throughput: " << measurements.flowsAverageThroughput << " Mbps\n";
     outFile << "\tMean flow delay: " << measurements.flowsAverageDelay.As(Time::MS) << "\n";
     outFile << "\tMedian flow delay: " << measurements.delayValuesMedian.As(Time::MS) << "\n";
-
-
-    outFile.close();
-
-    std::ifstream f(filename.c_str());
-
-
-    ns3::Time MEASURING_TIME; 
+    
     if(
-        measurements.throughput > thresholds.throughput || 
-        measurements.meanDelay > thresholds.meanDelay || 
-        measurements.lastPacketDelay > thresholds.lastPacketDelay || 
-        measurements.meanJitter > thresholds.meanJitter
+        measurements.flowsAverageThroughput < thresholds.flowsAverageThroughput || 
+        measurements.flowsAverageDelay > thresholds.flowsAverageDelay
     ){
         MEASURING_TIME = NETWORK_NOT_OK_MEASURING_TIME; 
+        outFile << "\n\tavg. threshold surpassed " << "\n";
+        std::optional<std::pair<int64_t,int64_t>> worstPerformingLink = nodeToNodeTrigger(monitor,node_to_node_doc_path);
+        if (worstPerformingLink.has_value()) {
+            outFile << "\tWorst performing link: ("<< worstPerformingLink.value().first << "," << worstPerformingLink.value().second << ")" << std::endl;
+            
+        }
     } 
     else{
 
         MEASURING_TIME = NETWORK_OK_MEASURING_TIME;
+        outFile << "\n\tavg. under threshold " << "\n";
+        std::optional<std::pair<int64_t,int64_t>> worstPerformingLink = nodeToNodeTrigger(monitor,node_to_node_doc_path);
     }
-    nodeToNodeTrigger(monitor,node_to_node_doc_path);
+    outFile.close();
 
     // We reset all stats to ensure that we're not reusing them for the next iteration
-    // monitor->ResetAllStats();
-    // Simulator::Schedule(MEASURING_TIME, &reportFlowStats, monitor, classifier, filename, false);
+    monitor->ResetAllStats();
+    std::cout << "finished with reportFlowStats" << std::endl;
+    // Simulator::Schedule(simTime , &reportFlowStats, monitor, classifier, filename, false);
 }

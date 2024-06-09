@@ -58,7 +58,17 @@ build_lib_example(
                     ${libflow-monitor}
                     ${TINYXML2_LIBRARY}
 )
-    
+
+build_lib_example(
+  NAME simple-global-routing
+  SOURCE_FILES simple-global-routing.cc
+  LIBRARIES_TO_LINK
+    ${libpoint-to-point}
+    ${libinternet}
+    ${libapplications}
+    ${libflow-monitor}
+    ${TINYXML2_LIBRARY}
+)
 
 if(NOT
    ${ENABLE_SQLITE}
