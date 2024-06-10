@@ -336,7 +336,7 @@ void nodeToNodeTriggerVoidWrapper(Ptr<FlowMonitor> monitor, std::string node_to_
     nodeToNodeTrigger(monitor,node_to_node_doc_path);
 }
 
-void reportFlowStats(Ptr<FlowMonitor> monitor,Ptr<Ipv4FlowClassifier> classifier,std::string filename, bool newFiles){
+void reportFlowStats(Ptr<FlowMonitor> monitor,Ptr<Ipv4FlowClassifier> classifier,std::string filename, bool newFiles, Time simTime){
 
     // File managment for our logs
     XMLDocument measurements_doc; 
@@ -374,7 +374,6 @@ void reportFlowStats(Ptr<FlowMonitor> monitor,Ptr<Ipv4FlowClassifier> classifier
     uint64_t cont = 0;
 
     // Redefining equal to topology1_3 because we're prototyping
-    Time simTime = MilliSeconds(1400);
     Time appStartTime = MilliSeconds(400);
     
     outFile << "Report flow stats " << Simulator::Now().As(Time::MS) << ", Current measuring time " << MEASURING_TIME << std::endl;
@@ -474,5 +473,13 @@ void reportFlowStats(Ptr<FlowMonitor> monitor,Ptr<Ipv4FlowClassifier> classifier
     // We reset all stats to ensure that we're not reusing them for the next iteration
     monitor->ResetAllStats();
     std::cout << "finished with reportFlowStats" << std::endl;
-    // Simulator::Schedule(simTime , &reportFlowStats, monitor, classifier, filename, false);
+
+    // If there isn't time for next measurment...
+    if ((simTime - Simulator::Now()) < MilliSeconds(1000)){
+        std::cout << Simulator::Now().As(Time::MS) << std::endl;
+        std::cout << (simTime - Simulator::Now()).As(Time::MS)<< std::endl;
+        Simulator::Stop(simTime - Simulator::Now());
+    } else {
+        Simulator::Schedule(MilliSeconds(1000),&reportFlowStats,monitor,classifier,filename, false,simTime);
+    }
 }
