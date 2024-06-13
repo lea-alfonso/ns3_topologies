@@ -1,16 +1,24 @@
 <network-measurements>
     <worst-links>
         <worst-link>
-            <delay-value>7000007</delay-value>
+            <delay-value>1555919</delay-value>
             <timestamp>1400000000</timestamp>
+            <node-pair>
+                <node-id>3</node-id>
+                <node-id>33</node-id>
+            </node-pair>
+        </worst-link>
+        <worst-link>
+            <delay-value>7000012</delay-value>
+            <timestamp>2400000000</timestamp>
             <node-pair>
                 <node-id>37</node-id>
                 <node-id>38</node-id>
             </node-pair>
         </worst-link>
         <worst-link>
-            <delay-value>9000021</delay-value>
-            <timestamp>2400000000</timestamp>
+            <delay-value>9000022</delay-value>
+            <timestamp>3400000000</timestamp>
             <node-pair>
                 <node-id>33</node-id>
                 <node-id>37</node-id>
@@ -25,12 +33,16 @@
             </node-pair>
             <measurements>
                 <measurement>
-                    <delay-value>1443412</delay-value>
+                    <delay-value>1555919</delay-value>
                     <timestamp>1400000000</timestamp>
                 </measurement>
                 <measurement>
-                    <delay-value>1539304</delay-value>
+                    <delay-value>1335668</delay-value>
                     <timestamp>2400000000</timestamp>
+                </measurement>
+                <measurement>
+                    <delay-value>1218462</delay-value>
+                    <timestamp>3400000000</timestamp>
                 </measurement>
             </measurements>
         </delay>
@@ -45,8 +57,12 @@
                     <timestamp>1400000000</timestamp>
                 </measurement>
                 <measurement>
-                    <delay-value>1582620</delay-value>
+                    <delay-value>1266096</delay-value>
                     <timestamp>2400000000</timestamp>
+                </measurement>
+                <measurement>
+                    <delay-value>1606276</delay-value>
+                    <timestamp>3400000000</timestamp>
                 </measurement>
             </measurements>
         </delay>
@@ -57,12 +73,16 @@
             </node-pair>
             <measurements>
                 <measurement>
-                    <delay-value>1590241</delay-value>
+                    <delay-value>1337214</delay-value>
                     <timestamp>1400000000</timestamp>
                 </measurement>
                 <measurement>
-                    <delay-value>1177187</delay-value>
+                    <delay-value>1227624</delay-value>
                     <timestamp>2400000000</timestamp>
+                </measurement>
+                <measurement>
+                    <delay-value>1500539</delay-value>
+                    <timestamp>3400000000</timestamp>
                 </measurement>
             </measurements>
         </delay>
@@ -77,8 +97,12 @@
                     <timestamp>1400000000</timestamp>
                 </measurement>
                 <measurement>
-                    <delay-value>1586180</delay-value>
+                    <delay-value>1512224</delay-value>
                     <timestamp>2400000000</timestamp>
+                </measurement>
+                <measurement>
+                    <delay-value>1603067</delay-value>
+                    <timestamp>3400000000</timestamp>
                 </measurement>
             </measurements>
         </delay>
@@ -93,8 +117,12 @@
                     <timestamp>1400000000</timestamp>
                 </measurement>
                 <measurement>
-                    <delay-value>1410400</delay-value>
+                    <delay-value>1401215</delay-value>
                     <timestamp>2400000000</timestamp>
+                </measurement>
+                <measurement>
+                    <delay-value>1466497</delay-value>
+                    <timestamp>3400000000</timestamp>
                 </measurement>
             </measurements>
         </delay>
@@ -109,8 +137,12 @@
                     <timestamp>1400000000</timestamp>
                 </measurement>
                 <measurement>
-                    <delay-value>1499676</delay-value>
+                    <delay-value>1647231</delay-value>
                     <timestamp>2400000000</timestamp>
+                </measurement>
+                <measurement>
+                    <delay-value>1579480</delay-value>
+                    <timestamp>3400000000</timestamp>
                 </measurement>
             </measurements>
         </delay>
@@ -121,12 +153,16 @@
             </node-pair>
             <measurements>
                 <measurement>
-                    <delay-value>1450770</delay-value>
+                    <delay-value>1509351</delay-value>
                     <timestamp>1400000000</timestamp>
                 </measurement>
                 <measurement>
-                    <delay-value>1596573</delay-value>
+                    <delay-value>1557552</delay-value>
                     <timestamp>2400000000</timestamp>
+                </measurement>
+                <measurement>
+                    <delay-value>1351316</delay-value>
+                    <timestamp>3400000000</timestamp>
                 </measurement>
             </measurements>
         </delay>
@@ -141,8 +177,12 @@
                     <timestamp>1400000000</timestamp>
                 </measurement>
                 <measurement>
-                    <delay-value>1455320</delay-value>
+                    <delay-value>1627618</delay-value>
                     <timestamp>2400000000</timestamp>
+                </measurement>
+                <measurement>
+                    <delay-value>1474386</delay-value>
+                    <timestamp>3400000000</timestamp>
                 </measurement>
             </measurements>
         </delay>
@@ -153,12 +193,16 @@
             </node-pair>
             <measurements>
                 <measurement>
-                    <delay-value>1525602</delay-value>
+                    <delay-value>1525626</delay-value>
                     <timestamp>1400000000</timestamp>
                 </measurement>
                 <measurement>
-                    <delay-value>1340221</delay-value>
+                    <delay-value>1214409</delay-value>
                     <timestamp>2400000000</timestamp>
+                </measurement>
+                <measurement>
+                    <delay-value>1388360</delay-value>
+                    <timestamp>3400000000</timestamp>
                 </measurement>
             </measurements>
         </delay>
@@ -173,8 +217,12 @@
                     <timestamp>1400000000</timestamp>
                 </measurement>
                 <measurement>
-                    <delay-value>1212875</delay-value>
+                    <delay-value>1495968</delay-value>
                     <timestamp>2400000000</timestamp>
+                </measurement>
+                <measurement>
+                    <delay-value>1319269</delay-value>
+                    <timestamp>3400000000</timestamp>
                 </measurement>
             </measurements>
         </delay>
@@ -189,8 +237,12 @@
                     <timestamp>1400000000</timestamp>
                 </measurement>
                 <measurement>
-                    <delay-value>1511661</delay-value>
+                    <delay-value>1332869</delay-value>
                     <timestamp>2400000000</timestamp>
+                </measurement>
+                <measurement>
+                    <delay-value>1507948</delay-value>
+                    <timestamp>3400000000</timestamp>
                 </measurement>
             </measurements>
         </delay>
@@ -201,12 +253,16 @@
             </node-pair>
             <measurements>
                 <measurement>
-                    <delay-value>1335389</delay-value>
+                    <delay-value>1445563</delay-value>
                     <timestamp>1400000000</timestamp>
                 </measurement>
                 <measurement>
-                    <delay-value>1526656</delay-value>
+                    <delay-value>1396838</delay-value>
                     <timestamp>2400000000</timestamp>
+                </measurement>
+                <measurement>
+                    <delay-value>1337673</delay-value>
+                    <timestamp>3400000000</timestamp>
                 </measurement>
             </measurements>
         </delay>
@@ -221,8 +277,12 @@
                     <timestamp>1400000000</timestamp>
                 </measurement>
                 <measurement>
-                    <delay-value>1515127</delay-value>
+                    <delay-value>1270087</delay-value>
                     <timestamp>2400000000</timestamp>
+                </measurement>
+                <measurement>
+                    <delay-value>1551973</delay-value>
+                    <timestamp>3400000000</timestamp>
                 </measurement>
             </measurements>
         </delay>
@@ -233,12 +293,16 @@
             </node-pair>
             <measurements>
                 <measurement>
-                    <delay-value>1267115</delay-value>
+                    <delay-value>1223903</delay-value>
                     <timestamp>1400000000</timestamp>
                 </measurement>
                 <measurement>
-                    <delay-value>1367159</delay-value>
+                    <delay-value>1423524</delay-value>
                     <timestamp>2400000000</timestamp>
+                </measurement>
+                <measurement>
+                    <delay-value>1656861</delay-value>
+                    <timestamp>3400000000</timestamp>
                 </measurement>
             </measurements>
         </delay>
@@ -249,12 +313,16 @@
             </node-pair>
             <measurements>
                 <measurement>
-                    <delay-value>1497877</delay-value>
+                    <delay-value>1504018</delay-value>
                     <timestamp>1400000000</timestamp>
                 </measurement>
                 <measurement>
-                    <delay-value>1397145</delay-value>
+                    <delay-value>1345510</delay-value>
                     <timestamp>2400000000</timestamp>
+                </measurement>
+                <measurement>
+                    <delay-value>1221077</delay-value>
+                    <timestamp>3400000000</timestamp>
                 </measurement>
             </measurements>
         </delay>
@@ -265,12 +333,16 @@
             </node-pair>
             <measurements>
                 <measurement>
-                    <delay-value>1464467</delay-value>
+                    <delay-value>1464479</delay-value>
                     <timestamp>1400000000</timestamp>
                 </measurement>
                 <measurement>
-                    <delay-value>1592217</delay-value>
+                    <delay-value>1639293</delay-value>
                     <timestamp>2400000000</timestamp>
+                </measurement>
+                <measurement>
+                    <delay-value>1184651</delay-value>
+                    <timestamp>3400000000</timestamp>
                 </measurement>
             </measurements>
         </delay>
@@ -285,8 +357,12 @@
                     <timestamp>1400000000</timestamp>
                 </measurement>
                 <measurement>
-                    <delay-value>1498727</delay-value>
+                    <delay-value>1607968</delay-value>
                     <timestamp>2400000000</timestamp>
+                </measurement>
+                <measurement>
+                    <delay-value>1224206</delay-value>
+                    <timestamp>3400000000</timestamp>
                 </measurement>
             </measurements>
         </delay>
@@ -301,8 +377,12 @@
                     <timestamp>1400000000</timestamp>
                 </measurement>
                 <measurement>
-                    <delay-value>1334323</delay-value>
+                    <delay-value>1340697</delay-value>
                     <timestamp>2400000000</timestamp>
+                </measurement>
+                <measurement>
+                    <delay-value>1533129</delay-value>
+                    <timestamp>3400000000</timestamp>
                 </measurement>
             </measurements>
         </delay>
@@ -313,12 +393,16 @@
             </node-pair>
             <measurements>
                 <measurement>
-                    <delay-value>1264927</delay-value>
+                    <delay-value>1347620</delay-value>
                     <timestamp>1400000000</timestamp>
                 </measurement>
                 <measurement>
-                    <delay-value>1436480</delay-value>
+                    <delay-value>1370279</delay-value>
                     <timestamp>2400000000</timestamp>
+                </measurement>
+                <measurement>
+                    <delay-value>1500528</delay-value>
+                    <timestamp>3400000000</timestamp>
                 </measurement>
             </measurements>
         </delay>
@@ -333,8 +417,12 @@
                     <timestamp>1400000000</timestamp>
                 </measurement>
                 <measurement>
-                    <delay-value>1197274</delay-value>
+                    <delay-value>1666688</delay-value>
                     <timestamp>2400000000</timestamp>
+                </measurement>
+                <measurement>
+                    <delay-value>1669231</delay-value>
+                    <timestamp>3400000000</timestamp>
                 </measurement>
             </measurements>
         </delay>
@@ -345,12 +433,16 @@
             </node-pair>
             <measurements>
                 <measurement>
-                    <delay-value>1438591</delay-value>
+                    <delay-value>1509176</delay-value>
                     <timestamp>1400000000</timestamp>
                 </measurement>
                 <measurement>
-                    <delay-value>1414403</delay-value>
+                    <delay-value>1271190</delay-value>
                     <timestamp>2400000000</timestamp>
+                </measurement>
+                <measurement>
+                    <delay-value>1276659</delay-value>
+                    <timestamp>3400000000</timestamp>
                 </measurement>
             </measurements>
         </delay>
@@ -365,8 +457,12 @@
                     <timestamp>1400000000</timestamp>
                 </measurement>
                 <measurement>
-                    <delay-value>1267696</delay-value>
+                    <delay-value>1648858</delay-value>
                     <timestamp>2400000000</timestamp>
+                </measurement>
+                <measurement>
+                    <delay-value>1328735</delay-value>
+                    <timestamp>3400000000</timestamp>
                 </measurement>
             </measurements>
         </delay>
@@ -377,12 +473,16 @@
             </node-pair>
             <measurements>
                 <measurement>
-                    <delay-value>1353585</delay-value>
+                    <delay-value>1189204</delay-value>
                     <timestamp>1400000000</timestamp>
                 </measurement>
                 <measurement>
-                    <delay-value>1227995</delay-value>
+                    <delay-value>1536790</delay-value>
                     <timestamp>2400000000</timestamp>
+                </measurement>
+                <measurement>
+                    <delay-value>1310883</delay-value>
+                    <timestamp>3400000000</timestamp>
                 </measurement>
             </measurements>
         </delay>
@@ -393,12 +493,16 @@
             </node-pair>
             <measurements>
                 <measurement>
-                    <delay-value>1663045</delay-value>
+                    <delay-value>1397900</delay-value>
                     <timestamp>1400000000</timestamp>
                 </measurement>
                 <measurement>
-                    <delay-value>1417567</delay-value>
+                    <delay-value>1457828</delay-value>
                     <timestamp>2400000000</timestamp>
+                </measurement>
+                <measurement>
+                    <delay-value>1384635</delay-value>
+                    <timestamp>3400000000</timestamp>
                 </measurement>
             </measurements>
         </delay>
@@ -409,12 +513,16 @@
             </node-pair>
             <measurements>
                 <measurement>
-                    <delay-value>1538659</delay-value>
+                    <delay-value>1391907</delay-value>
                     <timestamp>1400000000</timestamp>
                 </measurement>
                 <measurement>
-                    <delay-value>1398662</delay-value>
+                    <delay-value>1249219</delay-value>
                     <timestamp>2400000000</timestamp>
+                </measurement>
+                <measurement>
+                    <delay-value>1600955</delay-value>
+                    <timestamp>3400000000</timestamp>
                 </measurement>
             </measurements>
         </delay>
@@ -429,8 +537,12 @@
                     <timestamp>1400000000</timestamp>
                 </measurement>
                 <measurement>
-                    <delay-value>1244371</delay-value>
+                    <delay-value>1422554</delay-value>
                     <timestamp>2400000000</timestamp>
+                </measurement>
+                <measurement>
+                    <delay-value>1529291</delay-value>
+                    <timestamp>3400000000</timestamp>
                 </measurement>
             </measurements>
         </delay>
@@ -441,12 +553,16 @@
             </node-pair>
             <measurements>
                 <measurement>
-                    <delay-value>1415117</delay-value>
+                    <delay-value>1347956</delay-value>
                     <timestamp>1400000000</timestamp>
                 </measurement>
                 <measurement>
-                    <delay-value>1648361</delay-value>
+                    <delay-value>1231240</delay-value>
                     <timestamp>2400000000</timestamp>
+                </measurement>
+                <measurement>
+                    <delay-value>1642749</delay-value>
+                    <timestamp>3400000000</timestamp>
                 </measurement>
             </measurements>
         </delay>
@@ -457,12 +573,16 @@
             </node-pair>
             <measurements>
                 <measurement>
-                    <delay-value>1306253</delay-value>
+                    <delay-value>1295298</delay-value>
                     <timestamp>1400000000</timestamp>
                 </measurement>
                 <measurement>
-                    <delay-value>1401842</delay-value>
+                    <delay-value>1651404</delay-value>
                     <timestamp>2400000000</timestamp>
+                </measurement>
+                <measurement>
+                    <delay-value>1422633</delay-value>
+                    <timestamp>3400000000</timestamp>
                 </measurement>
             </measurements>
         </delay>
@@ -477,8 +597,12 @@
                     <timestamp>1400000000</timestamp>
                 </measurement>
                 <measurement>
-                    <delay-value>1543055</delay-value>
+                    <delay-value>1509068</delay-value>
                     <timestamp>2400000000</timestamp>
+                </measurement>
+                <measurement>
+                    <delay-value>1622238</delay-value>
+                    <timestamp>3400000000</timestamp>
                 </measurement>
             </measurements>
         </delay>
@@ -493,8 +617,12 @@
                     <timestamp>1400000000</timestamp>
                 </measurement>
                 <measurement>
-                    <delay-value>1220583</delay-value>
+                    <delay-value>1175178</delay-value>
                     <timestamp>2400000000</timestamp>
+                </measurement>
+                <measurement>
+                    <delay-value>1536878</delay-value>
+                    <timestamp>3400000000</timestamp>
                 </measurement>
             </measurements>
         </delay>
@@ -509,8 +637,12 @@
                     <timestamp>1400000000</timestamp>
                 </measurement>
                 <measurement>
-                    <delay-value>9000021</delay-value>
+                    <delay-value>12</delay-value>
                     <timestamp>2400000000</timestamp>
+                </measurement>
+                <measurement>
+                    <delay-value>9000022</delay-value>
+                    <timestamp>3400000000</timestamp>
                 </measurement>
             </measurements>
         </delay>
@@ -525,8 +657,12 @@
                     <timestamp>1400000000</timestamp>
                 </measurement>
                 <measurement>
-                    <delay-value>21</delay-value>
+                    <delay-value>8</delay-value>
                     <timestamp>2400000000</timestamp>
+                </measurement>
+                <measurement>
+                    <delay-value>22</delay-value>
+                    <timestamp>3400000000</timestamp>
                 </measurement>
             </measurements>
         </delay>
@@ -537,12 +673,16 @@
             </node-pair>
             <measurements>
                 <measurement>
-                    <delay-value>7000007</delay-value>
+                    <delay-value>7</delay-value>
                     <timestamp>1400000000</timestamp>
                 </measurement>
                 <measurement>
-                    <delay-value>7000021</delay-value>
+                    <delay-value>7000012</delay-value>
                     <timestamp>2400000000</timestamp>
+                </measurement>
+                <measurement>
+                    <delay-value>22</delay-value>
+                    <timestamp>3400000000</timestamp>
                 </measurement>
             </measurements>
         </delay>
