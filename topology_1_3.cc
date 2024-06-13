@@ -961,7 +961,7 @@ main(int argc, char* argv[])
     p2ph = PointToPointHelper();
     p2ph.SetDeviceAttribute("DataRate", DataRateValue(DataRate("100Gb/s")));
     p2ph.SetDeviceAttribute("Mtu", UintegerValue(2500));
-    p2ph.SetChannelAttribute("Delay", StringValue(bottleNeckDelay));
+    p2ph.SetChannelAttribute("Delay", StringValue("0ns"));
 
     NodeContainer link2 = NodeContainer(intermediateNodes.Get(0), intermediateNodes.Get(1));
     NetDeviceContainer link2Devices = p2ph.Install(link2);
@@ -969,7 +969,9 @@ main(int argc, char* argv[])
     Ipv4InterfaceContainer link2Interfaces = ipv4h.Assign(link2Devices);
 
     // We schedule it to be the next bottleNeck 
-    Simulator::Schedule(MilliSeconds(1401), &ChangeLinkDelay, link1Devices.Get(0), MilliSeconds(9));
+    // Simulator::Schedule(MilliSeconds(1401), &ChangeLinkDelay, link2Devices.Get(0),bottleNeckDelay );
+    // Simulator::Schedule(MilliSeconds(2401), &ChangeLinkDelay, link2Devices.Get(0),"0ms" );
+    // Simulator::Schedule(MilliSeconds(2401), &ChangeLinkDelay, link1Devices.Get(0), "9ms");
 
     // 38 -> 36, second intermediateNode to remoteHost
     p2ph = PointToPointHelper();
@@ -1920,14 +1922,15 @@ main(int argc, char* argv[])
     flowMonitor->SetAttribute("DelayBinWidth", DoubleValue(0.001));
     flowMonitor->SetAttribute("JitterBinWidth", DoubleValue(0.001));
     flowMonitor->SetAttribute("PacketSizeBinWidth", DoubleValue(20));
-    std::string filename = outputDir + "/" + simTag;
-
+    std::ostringstream oss;
+    oss << outputDir << "/" << simTag << "_simTime-" << simTimeMs << "_trafficTypeConf-" << trafficTypeConf << "_direction-" << direction << "_bottleNeckDelay-" << bottleNeckDelay << "_useUdp-" << useUdp << "_uesPerGnb-" << uesPerGnb;
+     std::string filename = oss.str();
     flowMonitor->CheckForLostPackets();
     Ptr<Ipv4FlowClassifier> classifier =
         DynamicCast<Ipv4FlowClassifier>(flowmonHelper.GetClassifier());
-    Simulator::Schedule(MilliSeconds(1400),&reportFlowStats,flowMonitor,classifier,filename, true);
-    Simulator::Schedule(MilliSeconds(2400),&reportFlowStats,flowMonitor,classifier,filename, false);
-    Simulator::Stop(simTime);
+    Simulator::Schedule(MilliSeconds(1400),&reportFlowStats,flowMonitor,classifier,filename,MilliSeconds(400),simTime,TrackedStats());
+    // Simulator::Schedule(MilliSeconds(2400),&reportFlowStats,flowMonitor,classifier,filename, false);
+    // Simulator::Stop(simTime);
 
     Simulator::Run();
 

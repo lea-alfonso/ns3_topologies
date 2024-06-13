@@ -18,16 +18,21 @@ ns3::Time NETWORK_NOT_OK_MEASURING_TIME = MilliSeconds(100);
 ns3::Time MEASURING_TIME = MilliSeconds(100);
 
 struct TrackedStats {
-    double throughput; // Threshold for throughput
+    float rxDuration; // Double but it stores seconds!S
+    float throughput; // Threshold for throughput
     ns3::Time meanDelay; // Threshold for mean delay
     ns3::Time lastPacketDelay; // Threshold for last packet delay
     ns3::Time meanJitter; // Threshold for mean jitter
-    double flowsAverageThroughput;
+    float flowsAverageThroughput;
     Time flowsAverageDelay;
     Time delayValuesMedian;
     // Constructor to initialize the thresholds
-    TrackedStats(float throughput, ns3::Time meanDelay, ns3::Time lastPacketDelay, ns3::Time meanJitter, double flowsAverageThroughput, Time flowsAverageDelay, Time delayValuesMedian)
-        : throughput(throughput),
+    TrackedStats() : rxDuration(0), throughput(0.0), meanDelay(Seconds(0)), lastPacketDelay(Seconds(0)),
+                     meanJitter(Seconds(0)), flowsAverageThroughput(0.0),
+                     flowsAverageDelay(Seconds(0)), delayValuesMedian(Seconds(0)) {}
+    TrackedStats(float rxDuration,float throughput, ns3::Time meanDelay, ns3::Time lastPacketDelay, ns3::Time meanJitter, float flowsAverageThroughput, Time flowsAverageDelay, Time delayValuesMedian)
+        : rxDuration(rxDuration),
+          throughput(throughput),
           meanDelay(meanDelay),
           lastPacketDelay(lastPacketDelay),
           meanJitter(meanJitter),
@@ -88,11 +93,11 @@ bool IsFlowStatsEmpty(const FlowId flowId, const FlowMonitor::FlowStats& flowSta
         flowStat.packetsDropped.empty());
 }
 
-void ChangeLinkDelay(Ptr<NetDevice> device, Time newDelay) {
+void ChangeLinkDelay(Ptr<NetDevice> device, std::string newDelay) {
     std::cout << Simulator::Now().As(Time::MS) <<" Changing link delay!" << std::endl;
     Ptr<PointToPointChannel> p2pChannel = device->GetChannel()->GetObject<PointToPointChannel>();
     if (p2pChannel) {
-        p2pChannel->SetAttribute("Delay", TimeValue(newDelay));
+        p2pChannel->SetAttribute("Delay", StringValue(newDelay));
     } else {
         NS_LOG_ERROR("Failed to get PointToPointChannel object from the device.");
     }
@@ -102,11 +107,11 @@ std::optional<std::pair<int64_t,int64_t>> nodeToNodeTrigger(Ptr<FlowMonitor> mon
 // This function implements the first step in looking for the cause of a bad metric
 // Given a flow_id, we look for the worst performing FlowProbes
 {
-    XMLDocument measurements_doc; 
-    XMLError result = measurements_doc.LoadFile(node_to_node_doc_path.c_str());
+    XMLDocument ntnXmlFile; 
+    XMLError result = ntnXmlFile.LoadFile(node_to_node_doc_path.c_str());
     if (result != XML_SUCCESS && result != XML_ERROR_EMPTY_DOCUMENT) {
         // Handle error
-        std::cerr << "Error loading file: " << measurements_doc.ErrorIDToName(result) << std::endl;
+        std::cerr << "Error loading file: " << ntnXmlFile.ErrorIDToName(result) << std::endl;
         return std::nullopt;
     } 
 
@@ -115,17 +120,17 @@ std::optional<std::pair<int64_t,int64_t>> nodeToNodeTrigger(Ptr<FlowMonitor> mon
     std::map<std::pair<uint32_t,uint32_t>,ns3::Time> nodeToNodeDelay;
 
     // Get the root element
-    XMLElement* root = measurements_doc.FirstChildElement("network-measurements");
+    XMLElement* root = ntnXmlFile.FirstChildElement("network-measurements");
     if (!root) {
         // Create the root element if it doesn't exist
-        root = measurements_doc.NewElement("network-measurements");
-        measurements_doc.InsertEndChild(root);
+        root = ntnXmlFile.NewElement("network-measurements");
+        ntnXmlFile.InsertEndChild(root);
     }
 
     XMLElement* delaysElement = root->FirstChildElement("delays");
     if (!delaysElement) {
         // Create the 'delays' element if it doesn't exist
-        delaysElement = measurements_doc.NewElement("delays");
+        delaysElement = ntnXmlFile.NewElement("delays");
         root->InsertEndChild(delaysElement);
     }
 
@@ -251,41 +256,41 @@ std::optional<std::pair<int64_t,int64_t>> nodeToNodeTrigger(Ptr<FlowMonitor> mon
 
         if (!delayElement) {
             // The 'delay' element for this node pair doesn't exist, create a new one
-            delayElement = measurements_doc.NewElement("delay");
+            delayElement = ntnXmlFile.NewElement("delay");
             delaysElement->InsertEndChild(delayElement);
 
             // Create the 'node-pair' element
-            XMLElement* nodePairElement = measurements_doc.NewElement("node-pair");
+            XMLElement* nodePairElement = ntnXmlFile.NewElement("node-pair");
             delayElement->InsertEndChild(nodePairElement);
 
             // Add the node IDs
-            XMLElement* nodeIdElement1 = measurements_doc.NewElement("node-id");
-            nodeIdElement1->InsertEndChild(measurements_doc.NewText(std::to_string(nodeToNodeDelayIt->first.first).c_str()));
+            XMLElement* nodeIdElement1 = ntnXmlFile.NewElement("node-id");
+            nodeIdElement1->InsertEndChild(ntnXmlFile.NewText(std::to_string(nodeToNodeDelayIt->first.first).c_str()));
             nodePairElement->InsertEndChild(nodeIdElement1);
 
-            XMLElement* nodeIdElement2 = measurements_doc.NewElement("node-id");
-            nodeIdElement2->InsertEndChild(measurements_doc.NewText(std::to_string(nodeToNodeDelayIt->first.second).c_str()));
+            XMLElement* nodeIdElement2 = ntnXmlFile.NewElement("node-id");
+            nodeIdElement2->InsertEndChild(ntnXmlFile.NewText(std::to_string(nodeToNodeDelayIt->first.second).c_str()));
             nodePairElement->InsertEndChild(nodeIdElement2);
         }
 
         // Create the 'measurements' element
         XMLElement* measurementsElement = delayElement->FirstChildElement("measurements");
         if (!measurementsElement) {
-            measurementsElement = measurements_doc.NewElement("measurements");
+            measurementsElement = ntnXmlFile.NewElement("measurements");
             delayElement->InsertEndChild(measurementsElement);
         }
 
         // Create the 'measurement' element
-        XMLElement* measurementElement = measurements_doc.NewElement("measurement");
+        XMLElement* measurementElement = ntnXmlFile.NewElement("measurement");
         measurementsElement->InsertEndChild(measurementElement);
 
         // Add the delay value and timestamp
-        XMLElement* delayValueElement = measurements_doc.NewElement("delay-value");
-        delayValueElement->InsertEndChild(measurements_doc.NewText(std::to_string(nodeToNodeDelayIt->second.GetNanoSeconds()).c_str()));
+        XMLElement* delayValueElement = ntnXmlFile.NewElement("delay-value");
+        delayValueElement->InsertEndChild(ntnXmlFile.NewText(std::to_string(nodeToNodeDelayIt->second.GetNanoSeconds()).c_str()));
         measurementElement->InsertEndChild(delayValueElement);
 
-        XMLElement* timestampElement = measurements_doc.NewElement("timestamp");
-        timestampElement->InsertEndChild(measurements_doc.NewText(std::to_string(Simulator::Now().GetNanoSeconds()).c_str()));
+        XMLElement* timestampElement = ntnXmlFile.NewElement("timestamp");
+        timestampElement->InsertEndChild(ntnXmlFile.NewText(std::to_string(Simulator::Now().GetNanoSeconds()).c_str()));
         measurementElement->InsertEndChild(timestampElement);
 
         if (nodeToNodeDelayIt->second > maxDelay)
@@ -298,37 +303,37 @@ std::optional<std::pair<int64_t,int64_t>> nodeToNodeTrigger(Ptr<FlowMonitor> mon
 
     XMLElement* worstLinksElement = root->FirstChildElement("worst-links");
     if (!worstLinksElement) {
-        worstLinksElement = measurements_doc.NewElement("worst-links");
+        worstLinksElement = ntnXmlFile.NewElement("worst-links");
         root->InsertFirstChild(worstLinksElement);
     }
     
-    XMLElement* worstLinkElement = measurements_doc.NewElement("worst-link");
+    XMLElement* worstLinkElement = ntnXmlFile.NewElement("worst-link");
 
     // Add the delay value 
-    XMLElement* delayValueElement = measurements_doc.NewElement("delay-value");
-    delayValueElement->InsertEndChild(measurements_doc.NewText(std::to_string(maxDelay.GetNanoSeconds()).c_str()));
+    XMLElement* delayValueElement = ntnXmlFile.NewElement("delay-value");
+    delayValueElement->InsertEndChild(ntnXmlFile.NewText(std::to_string(maxDelay.GetNanoSeconds()).c_str()));
     worstLinkElement->InsertEndChild(delayValueElement);
     // Add the timestamp
-    XMLElement* timestampElement = measurements_doc.NewElement("timestamp");
-    timestampElement->InsertEndChild(measurements_doc.NewText(std::to_string(Simulator::Now().GetNanoSeconds()).c_str()));
+    XMLElement* timestampElement = ntnXmlFile.NewElement("timestamp");
+    timestampElement->InsertEndChild(ntnXmlFile.NewText(std::to_string(Simulator::Now().GetNanoSeconds()).c_str()));
     worstLinkElement->InsertEndChild(timestampElement);
 
     // Create the 'node-pair' element
-    XMLElement* nodePairElement = measurements_doc.NewElement("node-pair");
+    XMLElement* nodePairElement = ntnXmlFile.NewElement("node-pair");
 
     // Add the node IDs
-    XMLElement* nodeIdElement1 = measurements_doc.NewElement("node-id");
-    nodeIdElement1->InsertEndChild(measurements_doc.NewText(std::to_string(maxDelayIndex.first).c_str()));
+    XMLElement* nodeIdElement1 = ntnXmlFile.NewElement("node-id");
+    nodeIdElement1->InsertEndChild(ntnXmlFile.NewText(std::to_string(maxDelayIndex.first).c_str()));
     nodePairElement->InsertEndChild(nodeIdElement1);
 
-    XMLElement* nodeIdElement2 = measurements_doc.NewElement("node-id");
-    nodeIdElement2->InsertEndChild(measurements_doc.NewText(std::to_string(maxDelayIndex.second).c_str()));
+    XMLElement* nodeIdElement2 = ntnXmlFile.NewElement("node-id");
+    nodeIdElement2->InsertEndChild(ntnXmlFile.NewText(std::to_string(maxDelayIndex.second).c_str()));
     nodePairElement->InsertEndChild(nodeIdElement2);
     worstLinkElement->InsertEndChild(nodePairElement);
      
     worstLinksElement->InsertEndChild(worstLinkElement);
 
-    measurements_doc.SaveFile(node_to_node_doc_path.c_str());
+    ntnXmlFile.SaveFile(node_to_node_doc_path.c_str());
 
     return std::make_pair(maxDelayIndex.first,maxDelayIndex.second);
 }
@@ -336,107 +341,128 @@ void nodeToNodeTriggerVoidWrapper(Ptr<FlowMonitor> monitor, std::string node_to_
     nodeToNodeTrigger(monitor,node_to_node_doc_path);
 }
 
-void reportFlowStats(Ptr<FlowMonitor> monitor,Ptr<Ipv4FlowClassifier> classifier,std::string filename, bool newFiles, Time simTime){
-
-    // File managment for our logs
-    XMLDocument measurements_doc; 
+void reportFlowStats(Ptr<FlowMonitor> monitor,Ptr<Ipv4FlowClassifier> classifier,std::string filename, Time lastCalled,Time simTime, TrackedStats thresholds){
+    // File for keeping the node-to-node logs
+    XMLDocument ntnXmlFile; 
     std::ios_base::openmode open_file_flags;
-    std::string flow_performance_measurements_path = filename +"_flow_performance_measurements.dat";
+    std::string flow_performance_measurements_path = filename +"_flow_performance_measurements.log";
     std::string node_to_node_doc_path = filename + "_node_to_node_delays.xml";
+    std::string stats_file_path = filename +"_stats.dat";
 
-    if (newFiles) {
+    if (lastCalled == MilliSeconds(400)) {
         // We clean any previous measures_doc that could be present
-        measurements_doc.SaveFile( node_to_node_doc_path.c_str() );
+        ntnXmlFile.SaveFile( node_to_node_doc_path.c_str() );
         open_file_flags = std::ofstream::out | std::ofstream::trunc;
-
     } else {
         // We open a file to save the flow performance metrics
         open_file_flags = std::ofstream::out | std::ofstream::app ;
     }
-
-    std::ofstream outFile;
-    outFile.open(flow_performance_measurements_path.c_str(),open_file_flags);
-    if (!outFile.is_open())
+    // File for keeping the end-to-end logs
+    std::ofstream eteLogsFile;
+    // File for keeping stats to plot later
+    std::ofstream statsFile;
+    eteLogsFile.open(flow_performance_measurements_path.c_str(),open_file_flags);
+    statsFile.open(stats_file_path.c_str(),open_file_flags);
+    if (!eteLogsFile.is_open())
     {
         std::cerr << "Can't open file " << flow_performance_measurements_path << std::endl;
     }
-    outFile.setf(std::ios_base::fixed);
+    if (!statsFile.is_open())
+    {
+        std::cerr << "Can't open file " << stats_file_path << std::endl;
+    }
+    eteLogsFile.setf(std::ios_base::fixed);
+    statsFile.setf(std::ios_base::fixed);
 
     monitor->CheckForLostPackets(MilliSeconds(300));
 
-    TrackedStats measurements(0, Seconds(0), Seconds(0), Seconds(0), 0, Seconds(0),Seconds(0));
+    TrackedStats measurements(0,0, Seconds(0), Seconds(0), Seconds(0), 0, Seconds(0),Seconds(0));
     // TrackedStats(float throughput, ns3::Time meanDelay, ns3::Time lastPacketDelay, ns3::Time meanJitter, double flowsAverageThroughput, Time flowsAverageDelay, Time delayValuesMedian)
-    TrackedStats thresholds( 0.06, Seconds(1.0044), Seconds(0), Seconds(0), 0.055, Seconds(0.00419),Seconds(0));
+    // TrackedStats thresholds( 0.06, Seconds(1.0044), Seconds(0), Seconds(0), 0.055, Seconds(0.00419),Seconds(0));
     double averageFlowThroughput = 0.0;
     double averageFlowDelay = 0.0;
     FlowMonitor::FlowStatsContainer stats = monitor->GetFlowStats();
     std::vector<double> delayValues(stats.size());
     uint64_t cont = 0;
+    uint16_t lastFlowWrittenToFile = 0;
 
     // Redefining equal to topology1_3 because we're prototyping
-    Time appStartTime = MilliSeconds(400);
     
-    outFile << "Report flow stats " << Simulator::Now().As(Time::MS) << ", Current measuring time " << MEASURING_TIME << std::endl;
+    eteLogsFile << "Report flow stats " << Simulator::Now().As(Time::MS) << ", Current measuring time " << MEASURING_TIME.As(Time::MS) << std::endl;
+    statsFile << Simulator::Now().GetMilliSeconds();
 
     for (std::map<FlowId, FlowMonitor::FlowStats>::const_iterator i = stats.begin();
          i != stats.end();
          ++i)
     {
         if (!IsFlowStatsEmpty(i->first,i->second)) {
-        Ipv4FlowClassifier::FiveTuple t = classifier->FindFlow(i->first);
-        std::stringstream protoStream;
-        protoStream << (uint16_t)t.protocol;
-        if (t.protocol == 6)
-        {
-            protoStream.str("TCP");
-        }
-        if (t.protocol == 17)
-        {
-            protoStream.str("UDP");
-        }
-        outFile << "\tFlow " << i->first << " (" << t.sourceAddress << ":" << t.sourcePort << " -> "
-                << t.destinationAddress << ":" << t.destinationPort << ") proto " << protoStream.str() << "\n";
-        outFile << "\t\tTx Packets: " << i->second.txPackets << "\n";
-        outFile << "\t\tTx Bytes:   " << i->second.txBytes << "\n";
-        outFile << "\t\tTxOffered:  " << i->second.txBytes * 8.0 / (simTime - appStartTime).GetSeconds() / 1000.0 / 1000.0 << " Mbps\n";
-        outFile << "\t\tRx Packets: " << i->second.rxPackets << "\n";
-        outFile << "\t\tRx Bytes:   " << i->second.rxBytes << "\n";
+            Ipv4FlowClassifier::FiveTuple t = classifier->FindFlow(i->first);
+            std::stringstream protoStream;
+            protoStream << (uint16_t)t.protocol;
+            if (t.protocol == 6)
+            {
+                protoStream.str("TCP");
+            }
+            if (t.protocol == 17)
+            {
+                protoStream.str("UDP");
+            }
+            eteLogsFile << "\tFlow " << i->first << " (" << t.sourceAddress << ":" << t.sourcePort << " -> "
+                    << t.destinationAddress << ":" << t.destinationPort << ") proto " << protoStream.str() << "\n";
+            eteLogsFile << "\t\tTx Packets: " << i->second.txPackets << "\n";
+            eteLogsFile << "\t\tTx Bytes:   " << i->second.txBytes << "\n";
+            eteLogsFile << "\t\tTxOffered:  " << i->second.txBytes * 8.0 / (Simulator::Now() - lastCalled).GetSeconds() / 1000.0 / 1000.0 << " Mbps\n";
+            eteLogsFile << "\t\tRx Packets: " << i->second.rxPackets << "\n";
+            eteLogsFile << "\t\tRx Bytes:   " << i->second.rxBytes << "\n";
 
-        // We initialize througput, meanDelay and meanJitter with -
-        measurements.throughput = 0;
-        measurements.meanDelay = Seconds(0);
-        measurements.meanJitter = Seconds(0);
-        
-        measurements.lastPacketDelay = i->second.lastDelay;
-        if (i->second.rxPackets > 0)
-        {
+            // We initialize througput, meanDelay and meanJitter with -
+            measurements.rxDuration = 0;
+            measurements.throughput = 0;
+            measurements.meanDelay = Seconds(0);
+            measurements.meanJitter = Seconds(0);
+
+            
+            measurements.lastPacketDelay = i->second.lastDelay;
+            if (i->second.rxPackets > 0) {
                 // Measure the duration of the flow from receiver's perspective
-                double rxDuration = (simTime - appStartTime).GetSeconds();
+                float rxDuration = (Simulator::Now() - lastCalled).GetSeconds();
 
                 averageFlowThroughput += i->second.rxBytes * 8.0 / rxDuration / 1000 / 1000;
                 averageFlowDelay += i->second.delaySum.GetSeconds() / i->second.rxPackets;
                 delayValues[cont] = i->second.delaySum.GetSeconds() / i->second.rxPackets;
                 cont++;
                 // In Mbps
+                measurements.rxDuration = rxDuration;
                 measurements.throughput = i->second.rxBytes * 8.0 / rxDuration / 1000 / 1000;
                 measurements.meanDelay = Seconds( i->second.delaySum.GetSeconds() / i->second.rxPackets);
                 measurements.meanJitter = Seconds(i->second.jitterSum.GetSeconds() / i->second.rxPackets);
-            } 
-            
-            outFile << "\t\tThroughput: " << measurements.throughput << " Mbps\n";
-            outFile << "\t\tMean delay: "<< measurements.meanDelay.As(Time::MS) << " \n";
-            outFile << "\t\tLast packet delay: " << measurements.lastPacketDelay.As(Time::MS) << " \n";
-            outFile << "\t\tMean jitter: " << measurements.meanJitter.As(Time::MS) << "\n";
-
-            if(
-                measurements.throughput < thresholds.throughput || 
-                measurements.meanDelay > thresholds.meanDelay
-            ){
-                outFile << "\n\t Flow "<< i->first <<" surpassing threshold " << "\n";
-            } else{
-                outFile << "\n\t Flow "<< i->first <<" under threshold " << "\n";
             }
+                
+            eteLogsFile << "\t\tRxDuration: " << measurements.rxDuration << " s\n";
+            eteLogsFile << "\t\tThroughput: " << measurements.throughput << " Mbps\n";
+            eteLogsFile << "\t\tMean delay: "<< measurements.meanDelay.As(Time::MS) << " \n";
+            eteLogsFile << "\t\tLast packet delay: " << measurements.lastPacketDelay.As(Time::MS) << " \n";
+            eteLogsFile << "\t\tMean jitter: " << measurements.meanJitter.As(Time::MS) << "\n";
+
+            // Compasate for flow that might have dissapeared
+            // std::cout << "LastFlowWrittenToFile " << lastFlowWrittenToFile << std::endl;
+            // for( int j = lastFlowWrittenToFile + 1; j < i->first; ++j) {
+            //     statsFile << "\t0.000000\t0.000000\t0.000000";
+            // }
+            statsFile << "\t" << measurements.throughput << "\t" << (measurements.meanDelay.GetDouble()/1000000) << "\t" << (measurements.meanJitter.GetDouble()/1000000);
+            lastFlowWrittenToFile = i->first;
+
+            // if( !(lastCalled == MilliSeconds(400)) && (
+            //     measurements.throughput < thresholds.throughput || 
+            //     measurements.meanDelay > thresholds.meanDelay)
+            // ){
+            //     eteLogsFile << "\n\t Flow "<< i->first <<" surpassing threshold " << "\n";
+            // }
+        } else {
+            // Fill the position of the non active flows
+            statsFile << "\t0.000000\t0.000000\t0.000000";
         }
+    
     }
     std::sort(delayValues.begin(), delayValues.end());
     double delayValuesMedian = delayValues[stats.size() / 2];
@@ -446,29 +472,36 @@ void reportFlowStats(Ptr<FlowMonitor> monitor,Ptr<Ipv4FlowClassifier> classifier
     measurements.flowsAverageDelay = Seconds(averageFlowDelay / stats.size());
     measurements.delayValuesMedian = Seconds(delayValuesMedian);
 
-    outFile << "\n\n\tMean flow throughput: " << measurements.flowsAverageThroughput << " Mbps\n";
-    outFile << "\tMean flow delay: " << measurements.flowsAverageDelay.As(Time::MS) << "\n";
-    outFile << "\tMedian flow delay: " << measurements.delayValuesMedian.As(Time::MS) << "\n";
-    
-    if(
-        measurements.flowsAverageThroughput < thresholds.flowsAverageThroughput || 
-        measurements.flowsAverageDelay > thresholds.flowsAverageDelay
-    ){
-        MEASURING_TIME = NETWORK_NOT_OK_MEASURING_TIME; 
-        outFile << "\n\tavg. threshold surpassed " << "\n";
-        std::optional<std::pair<int64_t,int64_t>> worstPerformingLink = nodeToNodeTrigger(monitor,node_to_node_doc_path);
-        if (worstPerformingLink.has_value()) {
-            outFile << "\tWorst performing link: ("<< worstPerformingLink.value().first << "," << worstPerformingLink.value().second << ")" << std::endl;
-            
-        }
-    } 
-    else{
+    eteLogsFile << "\n\n\tMean flow throughput: " << measurements.flowsAverageThroughput << " Mbps\n";
+    eteLogsFile << "\tMean flow delay: " << measurements.flowsAverageDelay.As(Time::MS) << "\n";
+    eteLogsFile << "\tMedian flow delay: " << measurements.delayValuesMedian.As(Time::MS) << "\n";
+    statsFile << "\t" << (measurements.flowsAverageDelay.GetDouble() / 1000000) << "\t" << measurements.flowsAverageThroughput << std::endl;
 
-        MEASURING_TIME = NETWORK_OK_MEASURING_TIME;
-        outFile << "\n\tavg. under threshold " << "\n";
-        std::optional<std::pair<int64_t,int64_t>> worstPerformingLink = nodeToNodeTrigger(monitor,node_to_node_doc_path);
-    }
-    outFile.close();
+    // Now we check wheter or not we need to call a node-to-node mearurment
+    // std::optional<std::pair<int64_t,int64_t>> worstPerformingLink = nodeToNodeTrigger(monitor,node_to_node_doc_path);
+    // if (!(lastCalled == MilliSeconds(400))) 
+    // {
+    //     if(
+    //         measurements.flowsAverageThroughput < thresholds.flowsAverageThroughput || 
+    //         measurements.flowsAverageDelay > thresholds.flowsAverageDelay
+    //     ){
+    //         MEASURING_TIME = NETWORK_NOT_OK_MEASURING_TIME; 
+    //         eteLogsFile << "\n\tavg. threshold surpassed " << "\n";
+    //         if (worstPerformingLink.has_value()) {
+    //             eteLogsFile << "\tWorst performing link: ("<< worstPerformingLink.value().first << "," << worstPerformingLink.value().second << ")" << std::endl;
+                
+    //         }
+    //     } 
+    //     else {
+    //         MEASURING_TIME = NETWORK_OK_MEASURING_TIME;
+    //         eteLogsFile << "\n\tavg. under threshold " << "\n";
+    //     }
+    // } else {
+    //     thresholds.flowsAverageThroughput =  measurements.flowsAverageThroughput;
+    //     thresholds.flowsAverageDelay =  measurements.flowsAverageDelay;
+    // }
+    eteLogsFile.close();
+    statsFile.close();
 
     // We reset all stats to ensure that we're not reusing them for the next iteration
     monitor->ResetAllStats();
@@ -480,6 +513,6 @@ void reportFlowStats(Ptr<FlowMonitor> monitor,Ptr<Ipv4FlowClassifier> classifier
         std::cout << (simTime - Simulator::Now()).As(Time::MS)<< std::endl;
         Simulator::Stop(simTime - Simulator::Now());
     } else {
-        Simulator::Schedule(MilliSeconds(1000),&reportFlowStats,monitor,classifier,filename, false,simTime);
+        Simulator::Schedule(MilliSeconds(1000),&reportFlowStats,monitor,classifier,filename,Simulator::Now(),simTime,thresholds);
     }
 }
