@@ -1,0 +1,282 @@
+Running with parameters:
+trafficTypeConf: 0
+direction: DL
+useUdp: true
+uesPerGnb: 10
+1
+
+  Traffic configuration selected is: UDP CBR
+  GNB num: 3
+  UE num: 30
+pgw -> in_1 -> in_2 -> remoteHost
+33->37->38->36
+Cell: 0 lambda (same lambda): 2000
+Cell: 1 lambda (same lambda): 2000
+Cell: 2 lambda (same lambda): 2000
+ue (sector1): 0 index: 0 lambda: 2000
+ue (sector1): 1 index: 0 lambda: 2000
+ue (sector1): 2 index: 0 lambda: 2000
+ue (sector1): 3 index: 0 lambda: 2000
+ue (sector1): 4 index: 0 lambda: 2000
+ue (sector1): 5 index: 0 lambda: 2000
+ue (sector1): 6 index: 0 lambda: 2000
+ue (sector1): 7 index: 0 lambda: 2000
+ue (sector1): 8 index: 0 lambda: 2000
+ue (sector1): 9 index: 0 lambda: 2000
+ue (sector2): 0 index: 1 lambda: 2000
+ue (sector2): 1 index: 1 lambda: 2000
+ue (sector2): 2 index: 1 lambda: 2000
+ue (sector2): 3 index: 1 lambda: 2000
+ue (sector2): 4 index: 1 lambda: 2000
+ue (sector2): 5 index: 1 lambda: 2000
+ue (sector2): 6 index: 1 lambda: 2000
+ue (sector2): 7 index: 1 lambda: 2000
+ue (sector2): 8 index: 1 lambda: 2000
+ue (sector2): 9 index: 1 lambda: 2000
+ue (sector3): 0 index: 2 lambda: 2000
+ue (sector3): 1 index: 2 lambda: 2000
+ue (sector3): 2 index: 2 lambda: 2000
+ue (sector3): 3 index: 2 lambda: 2000
+ue (sector3): 4 index: 2 lambda: 2000
+ue (sector3): 5 index: 2 lambda: 2000
+ue (sector3): 6 index: 2 lambda: 2000
+ue (sector3): 7 index: 2 lambda: 2000
+ue (sector3): 8 index: 2 lambda: 2000
+ue (sector3): 9 index: 2 lambda: 2000
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
++60400ms
++0ms
+Running with parameters:
+trafficTypeConf: 0
+direction: DL
+useUdp: true
+uesPerGnb: 20
+1
+
+  Traffic configuration selected is: UDP CBR
+  GNB num: 3
+  UE num: 60
+pgw -> in_1 -> in_2 -> remoteHost
+63->67->68->66
+Cell: 0 lambda (same lambda): 2000
+Cell: 1 lambda (same lambda): 2000
+Cell: 2 lambda (same lambda): 2000
+ue (sector1): 0 index: 0 lambda: 2000
+ue (sector1): 1 index: 0 lambda: 2000
+ue (sector1): 2 index: 0 lambda: 2000
+ue (sector1): 3 index: 0 lambda: 2000
+ue (sector1): 4 index: 0 lambda: 2000
+ue (sector1): 5 index: 0 lambda: 2000
+ue (sector1): 6 index: 0 lambda: 2000
+ue (sector1): 7 index: 0 lambda: 2000
+ue (sector1): 8 index: 0 lambda: 2000
+ue (sector1): 9 index: 0 lambda: 2000
+ue (sector1): 10 index: 0 lambda: 2000
+ue (sector1): 11 index: 0 lambda: 2000
+ue (sector1): 12 index: 0 lambda: 2000
+ue (sector1): 13 index: 0 lambda: 2000
+ue (sector1): 14 index: 0 lambda: 2000
+ue (sector1): 15 index: 0 lambda: 2000
+ue (sector1): 16 index: 0 lambda: 2000
+ue (sector1): 17 index: 0 lambda: 2000
+ue (sector1): 18 index: 0 lambda: 2000
+ue (sector1): 19 index: 0 lambda: 2000
+ue (sector2): 0 index: 1 lambda: 2000
+ue (sector2): 1 index: 1 lambda: 2000
+ue (sector2): 2 index: 1 lambda: 2000
+ue (sector2): 3 index: 1 lambda: 2000
+ue (sector2): 4 index: 1 lambda: 2000
+ue (sector2): 5 index: 1 lambda: 2000
+ue (sector2): 6 index: 1 lambda: 2000
+ue (sector2): 7 index: 1 lambda: 2000
+ue (sector2): 8 index: 1 lambda: 2000
+ue (sector2): 9 index: 1 lambda: 2000
+ue (sector2): 10 index: 1 lambda: 2000
+ue (sector2): 11 index: 1 lambda: 2000
+ue (sector2): 12 index: 1 lambda: 2000
+ue (sector2): 13 index: 1 lambda: 2000
+ue (sector2): 14 index: 1 lambda: 2000
+ue (sector2): 15 index: 1 lambda: 2000
+ue (sector2): 16 index: 1 lambda: 2000
+ue (sector2): 17 index: 1 lambda: 2000
+ue (sector2): 18 index: 1 lambda: 2000
+ue (sector2): 19 index: 1 lambda: 2000
+ue (sector3): 0 index: 2 lambda: 2000
+ue (sector3): 1 index: 2 lambda: 2000
+ue (sector3): 2 index: 2 lambda: 2000
+ue (sector3): 3 index: 2 lambda: 2000
+ue (sector3): 4 index: 2 lambda: 2000
+ue (sector3): 5 index: 2 lambda: 2000
+ue (sector3): 6 index: 2 lambda: 2000
+ue (sector3): 7 index: 2 lambda: 2000
+ue (sector3): 8 index: 2 lambda: 2000
+ue (sector3): 9 index: 2 lambda: 2000
+ue (sector3): 10 index: 2 lambda: 2000
+ue (sector3): 11 index: 2 lambda: 2000
+ue (sector3): 12 index: 2 lambda: 2000
+ue (sector3): 13 index: 2 lambda: 2000
+ue (sector3): 14 index: 2 lambda: 2000
+ue (sector3): 15 index: 2 lambda: 2000
+ue (sector3): 16 index: 2 lambda: 2000
+ue (sector3): 17 index: 2 lambda: 2000
+ue (sector3): 18 index: 2 lambda: 2000
+ue (sector3): 19 index: 2 lambda: 2000
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+finished with reportFlowStats
+Process was interrupted by the user
+Running with parameters:
+trafficTypeConf: 0
+direction: DL
+useUdp: false
+uesPerGnb: 10
+0
+
+  Traffic configuration selected is: UDP CBR
+  GNB num: 3
+  UE num: 30
+pgw -> in_1 -> in_2 -> remoteHost
+33->37->38->36
+Cell: 0 lambda (same lambda): 2000
+Cell: 1 lambda (same lambda): 2000
+Cell: 2 lambda (same lambda): 2000
+ue (sector1): 0 index: 0 lambda: 2000
+ue (sector1): 1 index: 0 lambda: 2000
+ue (sector1): 2 index: 0 lambda: 2000
+ue (sector1): 3 index: 0 lambda: 2000
+ue (sector1): 4 index: 0 lambda: 2000
+ue (sector1): 5 index: 0 lambda: 2000
+ue (sector1): 6 index: 0 lambda: 2000
+ue (sector1): 7 index: 0 lambda: 2000
+ue (sector1): 8 index: 0 lambda: 2000
+ue (sector1): 9 index: 0 lambda: 2000
+ue (sector2): 0 index: 1 lambda: 2000
+ue (sector2): 1 index: 1 lambda: 2000
+ue (sector2): 2 index: 1 lambda: 2000
+ue (sector2): 3 index: 1 lambda: 2000
+ue (sector2): 4 index: 1 lambda: 2000
+ue (sector2): 5 index: 1 lambda: 2000
+ue (sector2): 6 index: 1 lambda: 2000
+ue (sector2): 7 index: 1 lambda: 2000
+ue (sector2): 8 index: 1 lambda: 2000
+ue (sector2): 9 index: 1 lambda: 2000
+ue (sector3): 0 index: 2 lambda: 2000
+ue (sector3): 1 index: 2 lambda: 2000
+ue (sector3): 2 index: 2 lambda: 2000
+ue (sector3): 3 index: 2 lambda: 2000
+ue (sector3): 4 index: 2 lambda: 2000
+ue (sector3): 5 index: 2 lambda: 2000
+ue (sector3): 6 index: 2 lambda: 2000
+ue (sector3): 7 index: 2 lambda: 2000
+ue (sector3): 8 index: 2 lambda: 2000
+ue (sector3): 9 index: 2 lambda: 2000
+Process was interrupted by the user
+Running with parameters:
+trafficTypeConf: 0
+direction: DL
+useUdp: false
+uesPerGnb: 20

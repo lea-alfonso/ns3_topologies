@@ -1,0 +1,1702 @@
+Report flow stats +1400.000000ms, Current measuring time +100.000000ms
+	Flow 1 (14.0.0.5:2123 -> 14.0.0.6:2123) proto UDP
+		Tx Packets: 30
+		Tx Bytes:   4380
+		TxOffered:  0.035040 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 2 (14.0.0.5:2152 -> 14.0.0.6:2152) proto UDP
+		Tx Packets: 30
+		Tx Bytes:   3720
+		TxOffered:  0.029760 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 3 (10.0.2.2:49153 -> 7.0.0.2:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +1.671427ms 
+		Last packet delay: +1.671427ms 
+		Mean jitter: +0.000000ms
+	Flow 4 (10.0.2.2:49154 -> 7.0.0.3:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +1.707141ms 
+		Last packet delay: +1.707141ms 
+		Mean jitter: +0.000000ms
+	Flow 5 (10.0.2.2:49155 -> 7.0.0.4:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +1.742855ms 
+		Last packet delay: +1.742855ms 
+		Mean jitter: +0.000000ms
+	Flow 6 (10.0.2.2:49156 -> 7.0.0.5:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +1.778569ms 
+		Last packet delay: +1.778569ms 
+		Mean jitter: +0.000000ms
+	Flow 7 (10.0.2.2:49157 -> 7.0.0.6:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +1.814283ms 
+		Last packet delay: +1.814283ms 
+		Mean jitter: +0.000000ms
+	Flow 8 (10.0.2.2:49158 -> 7.0.0.7:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +1.849997ms 
+		Last packet delay: +1.849997ms 
+		Mean jitter: +0.000000ms
+	Flow 9 (10.0.2.2:49159 -> 7.0.0.8:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +1.885711ms 
+		Last packet delay: +1.885711ms 
+		Mean jitter: +0.000000ms
+	Flow 10 (10.0.2.2:49160 -> 7.0.0.9:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +1.921425ms 
+		Last packet delay: +1.921425ms 
+		Mean jitter: +0.000000ms
+	Flow 11 (10.0.2.2:49161 -> 7.0.0.10:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +1.957139ms 
+		Last packet delay: +1.957139ms 
+		Mean jitter: +0.000000ms
+	Flow 12 (10.0.2.2:49162 -> 7.0.0.11:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +1.992853ms 
+		Last packet delay: +1.992853ms 
+		Mean jitter: +0.000000ms
+	Flow 13 (10.0.2.2:49163 -> 7.0.0.12:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +1.671427ms 
+		Last packet delay: +1.671427ms 
+		Mean jitter: +0.000000ms
+	Flow 14 (10.0.2.2:49164 -> 7.0.0.13:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +1.707141ms 
+		Last packet delay: +1.707141ms 
+		Mean jitter: +0.000000ms
+	Flow 15 (10.0.2.2:49165 -> 7.0.0.14:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +1.742855ms 
+		Last packet delay: +1.742855ms 
+		Mean jitter: +0.000000ms
+	Flow 16 (10.0.2.2:49166 -> 7.0.0.15:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +1.778569ms 
+		Last packet delay: +1.778569ms 
+		Mean jitter: +0.000000ms
+	Flow 17 (10.0.2.2:49167 -> 7.0.0.16:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +1.814283ms 
+		Last packet delay: +1.814283ms 
+		Mean jitter: +0.000000ms
+	Flow 18 (10.0.2.2:49168 -> 7.0.0.17:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +1.849997ms 
+		Last packet delay: +1.849997ms 
+		Mean jitter: +0.000000ms
+	Flow 19 (10.0.2.2:49169 -> 7.0.0.18:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +1.885711ms 
+		Last packet delay: +1.885711ms 
+		Mean jitter: +0.000000ms
+	Flow 20 (10.0.2.2:49170 -> 7.0.0.19:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +1.921425ms 
+		Last packet delay: +1.921425ms 
+		Mean jitter: +0.000000ms
+	Flow 21 (10.0.2.2:49171 -> 7.0.0.20:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +1.957139ms 
+		Last packet delay: +1.957139ms 
+		Mean jitter: +0.000000ms
+	Flow 22 (10.0.2.2:49172 -> 7.0.0.21:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +1.992853ms 
+		Last packet delay: +1.992853ms 
+		Mean jitter: +0.000000ms
+	Flow 23 (10.0.2.2:49173 -> 7.0.0.22:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +1.671427ms 
+		Last packet delay: +1.671427ms 
+		Mean jitter: +0.000000ms
+	Flow 24 (10.0.2.2:49174 -> 7.0.0.23:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +1.707141ms 
+		Last packet delay: +1.707141ms 
+		Mean jitter: +0.000000ms
+	Flow 25 (10.0.2.2:49175 -> 7.0.0.24:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +1.742855ms 
+		Last packet delay: +1.742855ms 
+		Mean jitter: +0.000000ms
+	Flow 26 (10.0.2.2:49176 -> 7.0.0.25:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +1.778569ms 
+		Last packet delay: +1.778569ms 
+		Mean jitter: +0.000000ms
+	Flow 27 (10.0.2.2:49177 -> 7.0.0.26:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +1.814283ms 
+		Last packet delay: +1.814283ms 
+		Mean jitter: +0.000000ms
+	Flow 28 (10.0.2.2:49178 -> 7.0.0.27:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +1.849997ms 
+		Last packet delay: +1.849997ms 
+		Mean jitter: +0.000000ms
+	Flow 29 (10.0.2.2:49179 -> 7.0.0.28:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +1.885711ms 
+		Last packet delay: +1.885711ms 
+		Mean jitter: +0.000000ms
+	Flow 30 (10.0.2.2:49180 -> 7.0.0.29:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +1.921425ms 
+		Last packet delay: +1.921425ms 
+		Mean jitter: +0.000000ms
+	Flow 31 (10.0.2.2:49181 -> 7.0.0.30:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +1.957139ms 
+		Last packet delay: +1.957139ms 
+		Mean jitter: +0.000000ms
+	Flow 32 (10.0.2.2:49182 -> 7.0.0.31:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +1.992853ms 
+		Last packet delay: +1.992853ms 
+		Mean jitter: +0.000000ms
+	Flow 33 (7.0.0.2:4000 -> 10.0.2.2:49153) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 34 (7.0.0.12:4000 -> 10.0.2.2:49163) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 35 (7.0.0.22:4000 -> 10.0.2.2:49173) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 36 (7.0.0.3:4000 -> 10.0.2.2:49154) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 37 (7.0.0.13:4000 -> 10.0.2.2:49164) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 38 (7.0.0.23:4000 -> 10.0.2.2:49174) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 39 (7.0.0.4:4000 -> 10.0.2.2:49155) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 40 (7.0.0.14:4000 -> 10.0.2.2:49165) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 41 (7.0.0.24:4000 -> 10.0.2.2:49175) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 42 (7.0.0.5:4000 -> 10.0.2.2:49156) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 43 (7.0.0.15:4000 -> 10.0.2.2:49166) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 44 (7.0.0.25:4000 -> 10.0.2.2:49176) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 45 (7.0.0.6:4000 -> 10.0.2.2:49157) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 46 (7.0.0.16:4000 -> 10.0.2.2:49167) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 47 (7.0.0.26:4000 -> 10.0.2.2:49177) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 48 (7.0.0.7:4000 -> 10.0.2.2:49158) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 49 (7.0.0.17:4000 -> 10.0.2.2:49168) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 50 (7.0.0.27:4000 -> 10.0.2.2:49178) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 51 (7.0.0.8:4000 -> 10.0.2.2:49159) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 52 (7.0.0.18:4000 -> 10.0.2.2:49169) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 53 (7.0.0.28:4000 -> 10.0.2.2:49179) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 54 (7.0.0.9:4000 -> 10.0.2.2:49160) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 55 (7.0.0.19:4000 -> 10.0.2.2:49170) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 56 (7.0.0.29:4000 -> 10.0.2.2:49180) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 57 (7.0.0.10:4000 -> 10.0.2.2:49161) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 58 (7.0.0.20:4000 -> 10.0.2.2:49171) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 59 (7.0.0.30:4000 -> 10.0.2.2:49181) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 60 (7.0.0.11:4000 -> 10.0.2.2:49162) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 61 (7.0.0.21:4000 -> 10.0.2.2:49172) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 62 (7.0.0.31:4000 -> 10.0.2.2:49182) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+
+
+	Mean flow throughput: 0.000217 Mbps
+	Mean flow delay: +0.886519ms
+	Median flow delay: +0.000000ms
+Report flow stats +2400.000000ms, Current measuring time +100.000000ms
+
+
+	Mean flow throughput: 0.000000 Mbps
+	Mean flow delay: +0.000000ms
+	Median flow delay: +0.000000ms
+Report flow stats +3400.000000ms, Current measuring time +100.000000ms
+	Flow 3 (10.0.2.2:49153 -> 7.0.0.2:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 4 (10.0.2.2:49154 -> 7.0.0.3:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 5 (10.0.2.2:49155 -> 7.0.0.4:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 6 (10.0.2.2:49156 -> 7.0.0.5:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 7 (10.0.2.2:49157 -> 7.0.0.6:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 8 (10.0.2.2:49158 -> 7.0.0.7:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 9 (10.0.2.2:49159 -> 7.0.0.8:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 10 (10.0.2.2:49160 -> 7.0.0.9:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 11 (10.0.2.2:49161 -> 7.0.0.10:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 12 (10.0.2.2:49162 -> 7.0.0.11:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 13 (10.0.2.2:49163 -> 7.0.0.12:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 14 (10.0.2.2:49164 -> 7.0.0.13:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 15 (10.0.2.2:49165 -> 7.0.0.14:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 16 (10.0.2.2:49166 -> 7.0.0.15:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 17 (10.0.2.2:49167 -> 7.0.0.16:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 18 (10.0.2.2:49168 -> 7.0.0.17:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 19 (10.0.2.2:49169 -> 7.0.0.18:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 20 (10.0.2.2:49170 -> 7.0.0.19:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 21 (10.0.2.2:49171 -> 7.0.0.20:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 22 (10.0.2.2:49172 -> 7.0.0.21:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 23 (10.0.2.2:49173 -> 7.0.0.22:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 24 (10.0.2.2:49174 -> 7.0.0.23:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 25 (10.0.2.2:49175 -> 7.0.0.24:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 26 (10.0.2.2:49176 -> 7.0.0.25:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 27 (10.0.2.2:49177 -> 7.0.0.26:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 28 (10.0.2.2:49178 -> 7.0.0.27:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 29 (10.0.2.2:49179 -> 7.0.0.28:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 30 (10.0.2.2:49180 -> 7.0.0.29:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 31 (10.0.2.2:49181 -> 7.0.0.30:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 32 (10.0.2.2:49182 -> 7.0.0.31:4000) proto TCP
+		Tx Packets: 1
+		Tx Bytes:   56
+		TxOffered:  0.000448 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+
+
+	Mean flow throughput: 0.000000 Mbps
+	Mean flow delay: +0.000000ms
+	Median flow delay: +0.000000ms
+Report flow stats +4400.000000ms, Current measuring time +100.000000ms
+	Flow 3 (10.0.2.2:49153 -> 7.0.0.2:4000) proto TCP
+		Tx Packets: 0
+		Tx Bytes:   0
+		TxOffered:  0.000000 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +4.207141ms 
+		Last packet delay: +4.207141ms 
+		Mean jitter: +0.000000ms
+	Flow 4 (10.0.2.2:49154 -> 7.0.0.3:4000) proto TCP
+		Tx Packets: 0
+		Tx Bytes:   0
+		TxOffered:  0.000000 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +4.278569ms 
+		Last packet delay: +4.278569ms 
+		Mean jitter: +0.000000ms
+	Flow 5 (10.0.2.2:49155 -> 7.0.0.4:4000) proto TCP
+		Tx Packets: 0
+		Tx Bytes:   0
+		TxOffered:  0.000000 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +4.349997ms 
+		Last packet delay: +4.349997ms 
+		Mean jitter: +0.000000ms
+	Flow 6 (10.0.2.2:49156 -> 7.0.0.5:4000) proto TCP
+		Tx Packets: 0
+		Tx Bytes:   0
+		TxOffered:  0.000000 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +3.814283ms 
+		Last packet delay: +3.814283ms 
+		Mean jitter: +0.000000ms
+	Flow 7 (10.0.2.2:49157 -> 7.0.0.6:4000) proto TCP
+		Tx Packets: 0
+		Tx Bytes:   0
+		TxOffered:  0.000000 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +3.885711ms 
+		Last packet delay: +3.885711ms 
+		Mean jitter: +0.000000ms
+	Flow 8 (10.0.2.2:49158 -> 7.0.0.7:4000) proto TCP
+		Tx Packets: 0
+		Tx Bytes:   0
+		TxOffered:  0.000000 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +3.957139ms 
+		Last packet delay: +3.957139ms 
+		Mean jitter: +0.000000ms
+	Flow 9 (10.0.2.2:49159 -> 7.0.0.8:4000) proto TCP
+		Tx Packets: 0
+		Tx Bytes:   0
+		TxOffered:  0.000000 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +3.992853ms 
+		Last packet delay: +3.992853ms 
+		Mean jitter: +0.000000ms
+	Flow 10 (10.0.2.2:49160 -> 7.0.0.9:4000) proto TCP
+		Tx Packets: 0
+		Tx Bytes:   0
+		TxOffered:  0.000000 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +3.457139ms 
+		Last packet delay: +3.457139ms 
+		Mean jitter: +0.000000ms
+	Flow 11 (10.0.2.2:49161 -> 7.0.0.10:4000) proto TCP
+		Tx Packets: 0
+		Tx Bytes:   0
+		TxOffered:  0.000000 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +3.028567ms 
+		Last packet delay: +3.028567ms 
+		Mean jitter: +0.000000ms
+	Flow 12 (10.0.2.2:49162 -> 7.0.0.11:4000) proto TCP
+		Tx Packets: 0
+		Tx Bytes:   0
+		TxOffered:  0.000000 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +3.064281ms 
+		Last packet delay: +3.064281ms 
+		Mean jitter: +0.000000ms
+	Flow 13 (10.0.2.2:49163 -> 7.0.0.12:4000) proto TCP
+		Tx Packets: 0
+		Tx Bytes:   0
+		TxOffered:  0.000000 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +4.207141ms 
+		Last packet delay: +4.207141ms 
+		Mean jitter: +0.000000ms
+	Flow 14 (10.0.2.2:49164 -> 7.0.0.13:4000) proto TCP
+		Tx Packets: 0
+		Tx Bytes:   0
+		TxOffered:  0.000000 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +4.278569ms 
+		Last packet delay: +4.278569ms 
+		Mean jitter: +0.000000ms
+	Flow 15 (10.0.2.2:49165 -> 7.0.0.14:4000) proto TCP
+		Tx Packets: 0
+		Tx Bytes:   0
+		TxOffered:  0.000000 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +3.778569ms 
+		Last packet delay: +3.778569ms 
+		Mean jitter: +0.000000ms
+	Flow 16 (10.0.2.2:49166 -> 7.0.0.15:4000) proto TCP
+		Tx Packets: 0
+		Tx Bytes:   0
+		TxOffered:  0.000000 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +3.849997ms 
+		Last packet delay: +3.849997ms 
+		Mean jitter: +0.000000ms
+	Flow 17 (10.0.2.2:49167 -> 7.0.0.16:4000) proto TCP
+		Tx Packets: 0
+		Tx Bytes:   0
+		TxOffered:  0.000000 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +3.921425ms 
+		Last packet delay: +3.921425ms 
+		Mean jitter: +0.000000ms
+	Flow 18 (10.0.2.2:49168 -> 7.0.0.17:4000) proto TCP
+		Tx Packets: 0
+		Tx Bytes:   0
+		TxOffered:  0.000000 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +3.992853ms 
+		Last packet delay: +3.992853ms 
+		Mean jitter: +0.000000ms
+	Flow 19 (10.0.2.2:49169 -> 7.0.0.18:4000) proto TCP
+		Tx Packets: 0
+		Tx Bytes:   0
+		TxOffered:  0.000000 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +3.421425ms 
+		Last packet delay: +3.421425ms 
+		Mean jitter: +0.000000ms
+	Flow 20 (10.0.2.2:49170 -> 7.0.0.19:4000) proto TCP
+		Tx Packets: 0
+		Tx Bytes:   0
+		TxOffered:  0.000000 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +3.492853ms 
+		Last packet delay: +3.492853ms 
+		Mean jitter: +0.000000ms
+	Flow 21 (10.0.2.2:49171 -> 7.0.0.20:4000) proto TCP
+		Tx Packets: 0
+		Tx Bytes:   0
+		TxOffered:  0.000000 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +3.028567ms 
+		Last packet delay: +3.028567ms 
+		Mean jitter: +0.000000ms
+	Flow 22 (10.0.2.2:49172 -> 7.0.0.21:4000) proto TCP
+		Tx Packets: 0
+		Tx Bytes:   0
+		TxOffered:  0.000000 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +3.064281ms 
+		Last packet delay: +3.064281ms 
+		Mean jitter: +0.000000ms
+	Flow 23 (10.0.2.2:49173 -> 7.0.0.22:4000) proto TCP
+		Tx Packets: 0
+		Tx Bytes:   0
+		TxOffered:  0.000000 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +4.207141ms 
+		Last packet delay: +4.207141ms 
+		Mean jitter: +0.000000ms
+	Flow 24 (10.0.2.2:49174 -> 7.0.0.23:4000) proto TCP
+		Tx Packets: 0
+		Tx Bytes:   0
+		TxOffered:  0.000000 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +4.278569ms 
+		Last packet delay: +4.278569ms 
+		Mean jitter: +0.000000ms
+	Flow 25 (10.0.2.2:49175 -> 7.0.0.24:4000) proto TCP
+		Tx Packets: 0
+		Tx Bytes:   0
+		TxOffered:  0.000000 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +3.778569ms 
+		Last packet delay: +3.778569ms 
+		Mean jitter: +0.000000ms
+	Flow 26 (10.0.2.2:49176 -> 7.0.0.25:4000) proto TCP
+		Tx Packets: 0
+		Tx Bytes:   0
+		TxOffered:  0.000000 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +3.849997ms 
+		Last packet delay: +3.849997ms 
+		Mean jitter: +0.000000ms
+	Flow 27 (10.0.2.2:49177 -> 7.0.0.26:4000) proto TCP
+		Tx Packets: 0
+		Tx Bytes:   0
+		TxOffered:  0.000000 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +3.921425ms 
+		Last packet delay: +3.921425ms 
+		Mean jitter: +0.000000ms
+	Flow 28 (10.0.2.2:49178 -> 7.0.0.27:4000) proto TCP
+		Tx Packets: 0
+		Tx Bytes:   0
+		TxOffered:  0.000000 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +3.992853ms 
+		Last packet delay: +3.992853ms 
+		Mean jitter: +0.000000ms
+	Flow 29 (10.0.2.2:49179 -> 7.0.0.28:4000) proto TCP
+		Tx Packets: 0
+		Tx Bytes:   0
+		TxOffered:  0.000000 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +3.421425ms 
+		Last packet delay: +3.421425ms 
+		Mean jitter: +0.000000ms
+	Flow 30 (10.0.2.2:49180 -> 7.0.0.29:4000) proto TCP
+		Tx Packets: 0
+		Tx Bytes:   0
+		TxOffered:  0.000000 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +3.492853ms 
+		Last packet delay: +3.492853ms 
+		Mean jitter: +0.000000ms
+	Flow 31 (10.0.2.2:49181 -> 7.0.0.30:4000) proto TCP
+		Tx Packets: 0
+		Tx Bytes:   0
+		TxOffered:  0.000000 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +3.028567ms 
+		Last packet delay: +3.028567ms 
+		Mean jitter: +0.000000ms
+	Flow 32 (10.0.2.2:49182 -> 7.0.0.31:4000) proto TCP
+		Tx Packets: 0
+		Tx Bytes:   0
+		TxOffered:  0.000000 Mbps
+		Rx Packets: 1
+		Rx Bytes:   56
+		RxDuration: 1.000000 s
+		Throughput: 0.000448 Mbps
+		Mean delay: +3.064281ms 
+		Last packet delay: +3.064281ms 
+		Mean jitter: +0.000000ms
+	Flow 33 (7.0.0.2:4000 -> 10.0.2.2:49153) proto TCP
+		Tx Packets: 2
+		Tx Bytes:   112
+		TxOffered:  0.000896 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 34 (7.0.0.12:4000 -> 10.0.2.2:49163) proto TCP
+		Tx Packets: 2
+		Tx Bytes:   112
+		TxOffered:  0.000896 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 35 (7.0.0.22:4000 -> 10.0.2.2:49173) proto TCP
+		Tx Packets: 2
+		Tx Bytes:   112
+		TxOffered:  0.000896 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 36 (7.0.0.3:4000 -> 10.0.2.2:49154) proto TCP
+		Tx Packets: 2
+		Tx Bytes:   112
+		TxOffered:  0.000896 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 37 (7.0.0.13:4000 -> 10.0.2.2:49164) proto TCP
+		Tx Packets: 2
+		Tx Bytes:   112
+		TxOffered:  0.000896 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 38 (7.0.0.23:4000 -> 10.0.2.2:49174) proto TCP
+		Tx Packets: 2
+		Tx Bytes:   112
+		TxOffered:  0.000896 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 39 (7.0.0.4:4000 -> 10.0.2.2:49155) proto TCP
+		Tx Packets: 2
+		Tx Bytes:   112
+		TxOffered:  0.000896 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 40 (7.0.0.14:4000 -> 10.0.2.2:49165) proto TCP
+		Tx Packets: 2
+		Tx Bytes:   112
+		TxOffered:  0.000896 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 41 (7.0.0.24:4000 -> 10.0.2.2:49175) proto TCP
+		Tx Packets: 2
+		Tx Bytes:   112
+		TxOffered:  0.000896 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 42 (7.0.0.5:4000 -> 10.0.2.2:49156) proto TCP
+		Tx Packets: 2
+		Tx Bytes:   112
+		TxOffered:  0.000896 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 43 (7.0.0.15:4000 -> 10.0.2.2:49166) proto TCP
+		Tx Packets: 2
+		Tx Bytes:   112
+		TxOffered:  0.000896 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 44 (7.0.0.25:4000 -> 10.0.2.2:49176) proto TCP
+		Tx Packets: 2
+		Tx Bytes:   112
+		TxOffered:  0.000896 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 45 (7.0.0.6:4000 -> 10.0.2.2:49157) proto TCP
+		Tx Packets: 2
+		Tx Bytes:   112
+		TxOffered:  0.000896 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 46 (7.0.0.16:4000 -> 10.0.2.2:49167) proto TCP
+		Tx Packets: 2
+		Tx Bytes:   112
+		TxOffered:  0.000896 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 47 (7.0.0.26:4000 -> 10.0.2.2:49177) proto TCP
+		Tx Packets: 2
+		Tx Bytes:   112
+		TxOffered:  0.000896 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 48 (7.0.0.7:4000 -> 10.0.2.2:49158) proto TCP
+		Tx Packets: 2
+		Tx Bytes:   112
+		TxOffered:  0.000896 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 49 (7.0.0.17:4000 -> 10.0.2.2:49168) proto TCP
+		Tx Packets: 2
+		Tx Bytes:   112
+		TxOffered:  0.000896 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 50 (7.0.0.27:4000 -> 10.0.2.2:49178) proto TCP
+		Tx Packets: 2
+		Tx Bytes:   112
+		TxOffered:  0.000896 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 51 (7.0.0.8:4000 -> 10.0.2.2:49159) proto TCP
+		Tx Packets: 2
+		Tx Bytes:   112
+		TxOffered:  0.000896 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 52 (7.0.0.18:4000 -> 10.0.2.2:49169) proto TCP
+		Tx Packets: 2
+		Tx Bytes:   112
+		TxOffered:  0.000896 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 53 (7.0.0.28:4000 -> 10.0.2.2:49179) proto TCP
+		Tx Packets: 2
+		Tx Bytes:   112
+		TxOffered:  0.000896 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 54 (7.0.0.9:4000 -> 10.0.2.2:49160) proto TCP
+		Tx Packets: 2
+		Tx Bytes:   112
+		TxOffered:  0.000896 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 55 (7.0.0.19:4000 -> 10.0.2.2:49170) proto TCP
+		Tx Packets: 2
+		Tx Bytes:   112
+		TxOffered:  0.000896 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 56 (7.0.0.29:4000 -> 10.0.2.2:49180) proto TCP
+		Tx Packets: 2
+		Tx Bytes:   112
+		TxOffered:  0.000896 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 57 (7.0.0.10:4000 -> 10.0.2.2:49161) proto TCP
+		Tx Packets: 2
+		Tx Bytes:   112
+		TxOffered:  0.000896 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 58 (7.0.0.20:4000 -> 10.0.2.2:49171) proto TCP
+		Tx Packets: 2
+		Tx Bytes:   112
+		TxOffered:  0.000896 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 59 (7.0.0.30:4000 -> 10.0.2.2:49181) proto TCP
+		Tx Packets: 2
+		Tx Bytes:   112
+		TxOffered:  0.000896 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 60 (7.0.0.11:4000 -> 10.0.2.2:49162) proto TCP
+		Tx Packets: 2
+		Tx Bytes:   112
+		TxOffered:  0.000896 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 61 (7.0.0.21:4000 -> 10.0.2.2:49172) proto TCP
+		Tx Packets: 2
+		Tx Bytes:   112
+		TxOffered:  0.000896 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+	Flow 62 (7.0.0.31:4000 -> 10.0.2.2:49182) proto TCP
+		Tx Packets: 2
+		Tx Bytes:   112
+		TxOffered:  0.000896 Mbps
+		Rx Packets: 0
+		Rx Bytes:   0
+		RxDuration: 0.000000 s
+		Throughput: 0.000000 Mbps
+		Mean delay: +0.000000ms 
+		Last packet delay: +0.000000ms 
+		Mean jitter: +0.000000ms
+
+
+	Mean flow throughput: 0.000217 Mbps
+	Mean flow delay: +1.808178ms
+	Median flow delay: +0.000000ms
+Report flow stats +5400.000000ms, Current measuring time +100.000000ms
+
+
+	Mean flow throughput: 0.000000 Mbps
+	Mean flow delay: +0.000000ms
+	Median flow delay: +0.000000ms
