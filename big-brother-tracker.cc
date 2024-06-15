@@ -25,12 +25,13 @@ struct TrackedStats {
     ns3::Time meanJitter; // Threshold for mean jitter
     float flowsAverageThroughput;
     Time flowsAverageDelay;
+    Time flowsAverageMeanJitter;
     Time delayValuesMedian;
     // Constructor to initialize the thresholds
     TrackedStats() : rxDuration(0), throughput(0.0), meanDelay(Seconds(0)), lastPacketDelay(Seconds(0)),
                      meanJitter(Seconds(0)), flowsAverageThroughput(0.0),
-                     flowsAverageDelay(Seconds(0)), delayValuesMedian(Seconds(0)) {}
-    TrackedStats(float rxDuration,float throughput, ns3::Time meanDelay, ns3::Time lastPacketDelay, ns3::Time meanJitter, float flowsAverageThroughput, Time flowsAverageDelay, Time delayValuesMedian)
+                     flowsAverageDelay(Seconds(0)),flowsAverageMeanJitter(Seconds(0)), delayValuesMedian(Seconds(0)) {}
+    TrackedStats(float rxDuration,float throughput, ns3::Time meanDelay, ns3::Time lastPacketDelay, ns3::Time meanJitter, float flowsAverageThroughput, Time flowsAverageDelay,Time flowsAverageMeanJitter, Time delayValuesMedian)
         : rxDuration(rxDuration),
           throughput(throughput),
           meanDelay(meanDelay),
@@ -38,6 +39,7 @@ struct TrackedStats {
           meanJitter(meanJitter),
           flowsAverageThroughput(flowsAverageThroughput),
           flowsAverageDelay(flowsAverageDelay),
+          flowsAverageMeanJitter(flowsAverageMeanJitter),
           delayValuesMedian(delayValuesMedian) {}
 };
 
@@ -376,15 +378,15 @@ void reportFlowStats(Ptr<FlowMonitor> monitor,Ptr<Ipv4FlowClassifier> classifier
 
     monitor->CheckForLostPackets(MilliSeconds(300));
 
-    TrackedStats measurements(0,0, Seconds(0), Seconds(0), Seconds(0), 0, Seconds(0),Seconds(0));
+    TrackedStats measurements(0,0, Seconds(0), Seconds(0), Seconds(0), 0, Seconds(0),Seconds(0),Seconds(0));
     // TrackedStats(float throughput, ns3::Time meanDelay, ns3::Time lastPacketDelay, ns3::Time meanJitter, double flowsAverageThroughput, Time flowsAverageDelay, Time delayValuesMedian)
     // TrackedStats thresholds( 0.06, Seconds(1.0044), Seconds(0), Seconds(0), 0.055, Seconds(0.00419),Seconds(0));
     double averageFlowThroughput = 0.0;
     double averageFlowDelay = 0.0;
+    double averageMeanJitter = 0.0;
     FlowMonitor::FlowStatsContainer stats = monitor->GetFlowStats();
     std::vector<double> delayValues(stats.size());
     uint64_t cont = 0;
-    uint16_t lastFlowWrittenToFile = 0;
 
     // Redefining equal to topology1_3 because we're prototyping
     
@@ -429,6 +431,7 @@ void reportFlowStats(Ptr<FlowMonitor> monitor,Ptr<Ipv4FlowClassifier> classifier
 
                 averageFlowThroughput += i->second.rxBytes * 8.0 / rxDuration / 1000 / 1000;
                 averageFlowDelay += i->second.delaySum.GetSeconds() / i->second.rxPackets;
+                averageMeanJitter += i->second.jitterSum.GetSeconds() / i->second.rxPackets;
                 delayValues[cont] = i->second.delaySum.GetSeconds() / i->second.rxPackets;
                 cont++;
                 // In Mbps
@@ -444,13 +447,7 @@ void reportFlowStats(Ptr<FlowMonitor> monitor,Ptr<Ipv4FlowClassifier> classifier
             eteLogsFile << "\t\tLast packet delay: " << measurements.lastPacketDelay.As(Time::MS) << " \n";
             eteLogsFile << "\t\tMean jitter: " << measurements.meanJitter.As(Time::MS) << "\n";
 
-            // Compasate for flow that might have dissapeared
-            // std::cout << "LastFlowWrittenToFile " << lastFlowWrittenToFile << std::endl;
-            // for( int j = lastFlowWrittenToFile + 1; j < i->first; ++j) {
-            //     statsFile << "\t0.000000\t0.000000\t0.000000";
-            // }
             statsFile << "\t" << measurements.throughput << "\t" << (measurements.meanDelay.GetDouble()/1000000) << "\t" << (measurements.meanJitter.GetDouble()/1000000);
-            lastFlowWrittenToFile = i->first;
 
             // if( !(lastCalled == MilliSeconds(400)) && (
             //     measurements.throughput < thresholds.throughput || 
@@ -469,13 +466,14 @@ void reportFlowStats(Ptr<FlowMonitor> monitor,Ptr<Ipv4FlowClassifier> classifier
 
     // These metrics are global to all the flows
     measurements.flowsAverageThroughput = averageFlowThroughput / stats.size();
-    measurements.flowsAverageDelay = Seconds(averageFlowDelay / stats.size());
+    measurements.flowsAverageDelay= Seconds(averageFlowDelay / stats.size());
     measurements.delayValuesMedian = Seconds(delayValuesMedian);
+    measurements.flowsAverageMeanJitter = Seconds(averageMeanJitter / stats.size());
 
     eteLogsFile << "\n\n\tMean flow throughput: " << measurements.flowsAverageThroughput << " Mbps\n";
     eteLogsFile << "\tMean flow delay: " << measurements.flowsAverageDelay.As(Time::MS) << "\n";
     eteLogsFile << "\tMedian flow delay: " << measurements.delayValuesMedian.As(Time::MS) << "\n";
-    statsFile << "\t" << (measurements.flowsAverageDelay.GetDouble() / 1000000) << "\t" << measurements.flowsAverageThroughput << std::endl;
+    statsFile << "\t" << (measurements.flowsAverageDelay.GetDouble() / 1000000) << "\t" << measurements.flowsAverageThroughput << "\t" << (measurements.flowsAverageMeanJitter.GetDouble()/1000000) <<  std::endl;
 
     // Now we check wheter or not we need to call a node-to-node mearurment
     // std::optional<std::pair<int64_t,int64_t>> worstPerformingLink = nodeToNodeTrigger(monitor,node_to_node_doc_path);

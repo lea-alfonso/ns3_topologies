@@ -762,7 +762,7 @@ main(int argc, char* argv[])
 
     // Parse the command line
     cmd.Parse(argc, argv);
-
+    
     /*
      * Check if the parameter values provided by the user are correct.
      */
