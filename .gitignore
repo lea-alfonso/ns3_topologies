@@ -25,3 +25,4 @@ cttc-realistic-beamforming.cc
 traffic-generator-example.cc
 cttc-3gpp-channel-simple-fdm.cc
 cttc-lte-ca-demo.cc 
+experiments/*

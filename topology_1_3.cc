@@ -969,9 +969,17 @@ main(int argc, char* argv[])
     Ipv4InterfaceContainer link2Interfaces = ipv4h.Assign(link2Devices);
 
     // We schedule it to be the next bottleNeck 
-    // Simulator::Schedule(MilliSeconds(1401), &ChangeLinkDelay, link2Devices.Get(0),bottleNeckDelay );
-    // Simulator::Schedule(MilliSeconds(2401), &ChangeLinkDelay, link2Devices.Get(0),"0ms" );
-    // Simulator::Schedule(MilliSeconds(2401), &ChangeLinkDelay, link1Devices.Get(0), "9ms");
+
+    // We change it 1 second after the threshold has been proven to work
+    Simulator::Schedule(MilliSeconds(2401), &ChangeLinkDelay, link2Devices.Get(0),bottleNeckDelay + "ms" );
+
+    for( int i = 1 ; i <= stoi(bottleNeckDelay); i++) {
+        Simulator::Schedule(MilliSeconds(2401 + 500 * i), &ChangeLinkDelay, link2Devices.Get(0), std::to_string(stoi(bottleNeckDelay)-i) + "ms" );
+        Simulator::Schedule(MilliSeconds(2401 + ((stoi(bottleNeckDelay) + i) * 500)), &ChangeLinkDelay, link1Devices.Get(0), std::to_string(i) + "ms" );
+    }
+    Simulator::Schedule(MilliSeconds(2401 + 2*((stoi(bottleNeckDelay)+1)*500) ), &ChangeLinkDelay, link1Devices.Get(0),  "0ms" );
+
+    // Simulator::Schedule(MilliSeconds(3901), &ChangeLinkDelay, link1Devices.Get(0), "9ms");
 
     // 38 -> 36, second intermediateNode to remoteHost
     p2ph = PointToPointHelper();

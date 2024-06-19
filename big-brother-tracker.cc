@@ -13,9 +13,13 @@ using namespace tinyxml2;
 
 using namespace ns3;
 
-ns3::Time NETWORK_OK_MEASURING_TIME = MilliSeconds(100);
-ns3::Time NETWORK_NOT_OK_MEASURING_TIME = MilliSeconds(100);
-ns3::Time MEASURING_TIME = MilliSeconds(100);
+ns3::Time NETWORK_OK_MEASURING_TIME = MilliSeconds(1000);
+ns3::Time NETWORK_NOT_OK_MEASURING_TIME = MilliSeconds(500);
+ns3::Time NEXT_MEASURE_IN = MilliSeconds(1000);
+
+float RELATIVE_THRESHOLD_THROUGHPUT_ACCEPTANCE = 0.5;
+float RELATIVE_THRESHOLD_DELAY_ACCEPTANCE = 0.1;
+float RELATIVE_THRESHOLD_JITTER_ACCEPTANCE = 0.1;
 
 struct TrackedStats {
     float rxDuration; // Double but it stores seconds!S
@@ -49,40 +53,6 @@ bool compareByTime(const std::pair<uint32_t, ns3::Time>& a, const std::pair<uint
 
 bool IsFlowStatsEmpty(const FlowId flowId, const FlowMonitor::FlowStats& flowStat)
 {
-    // if (flowStat.delaySum != Seconds(0)) {
-    //     std::cout << "Flow id: "<< flowId << "delaySum is not zero\n";
-    // }
-    // if (flowStat.jitterSum != Seconds(0)) {
-    //     std::cout<< "Flow id: "<< flowId << "jitterSum is not zero\n";
-    // }
-    // if (flowStat.lastDelay != Seconds(0)) {
-    //     std::cout<< "Flow id: "<< flowId << "lastDelay is not zero\n";
-    // }
-    // if (flowStat.txBytes != 0) {
-    //     std::cout<< "Flow id: "<< flowId << "txBytes is not zero\n";
-    // }
-    // if (flowStat.rxBytes != 0) {
-    //     std::cout<< "Flow id: "<< flowId << "rxBytes is not zero\n";
-    // }
-    // if (flowStat.txPackets != 0) {
-    //     std::cout<< "Flow id: "<< flowId << "txPackets is not zero\n";
-    // }
-    // if (flowStat.rxPackets != 0) {
-    //     std::cout<< "Flow id: "<< flowId << "rxPackets is not zero\n";
-    // }
-    // if (flowStat.lostPackets != 0) {
-    //     std::cout<< "Flow id: "<< flowId << "lostPackets is not zero\n";
-    // }
-    // if (flowStat.timesForwarded != 0) {
-    //     std::cout<< "Flow id: "<< flowId << "timesForwarded is not zero\n";
-    // }
-    // if (!flowStat.bytesDropped.empty()) {
-    //     std::cout<< "Flow id: "<< flowId << "bytesDropped is not empty\n";
-    // }
-    // if (!flowStat.packetsDropped.empty()) {
-    //     std::cout<< "Flow id: "<< flowId << "packetsDropped is not empty\n";
-    // }
-
     return (flowStat.delaySum == Seconds(0) &&
         flowStat.jitterSum == Seconds(0) &&
         flowStat.lastDelay == Seconds(0) &&
@@ -379,8 +349,6 @@ void reportFlowStats(Ptr<FlowMonitor> monitor,Ptr<Ipv4FlowClassifier> classifier
     monitor->CheckForLostPackets(MilliSeconds(300));
 
     TrackedStats measurements(0,0, Seconds(0), Seconds(0), Seconds(0), 0, Seconds(0),Seconds(0),Seconds(0));
-    // TrackedStats(float throughput, ns3::Time meanDelay, ns3::Time lastPacketDelay, ns3::Time meanJitter, double flowsAverageThroughput, Time flowsAverageDelay, Time delayValuesMedian)
-    // TrackedStats thresholds( 0.06, Seconds(1.0044), Seconds(0), Seconds(0), 0.055, Seconds(0.00419),Seconds(0));
     double averageFlowThroughput = 0.0;
     double averageFlowDelay = 0.0;
     double averageMeanJitter = 0.0;
@@ -388,9 +356,7 @@ void reportFlowStats(Ptr<FlowMonitor> monitor,Ptr<Ipv4FlowClassifier> classifier
     std::vector<double> delayValues(stats.size());
     uint64_t cont = 0;
 
-    // Redefining equal to topology1_3 because we're prototyping
-    
-    eteLogsFile << "Report flow stats " << Simulator::Now().As(Time::MS) << ", Current measuring time " << MEASURING_TIME.As(Time::MS) << std::endl;
+    eteLogsFile << "Report flow stats " << Simulator::Now().As(Time::MS) << ", Current measuring time " << NEXT_MEASURE_IN.As(Time::MS) << std::endl;
     statsFile << Simulator::Now().GetMilliSeconds();
 
     for (std::map<FlowId, FlowMonitor::FlowStats>::const_iterator i = stats.begin();
@@ -470,47 +436,64 @@ void reportFlowStats(Ptr<FlowMonitor> monitor,Ptr<Ipv4FlowClassifier> classifier
     measurements.delayValuesMedian = Seconds(delayValuesMedian);
     measurements.flowsAverageMeanJitter = Seconds(averageMeanJitter / stats.size());
 
-    eteLogsFile << "\n\n\tMean flow throughput: " << measurements.flowsAverageThroughput << " Mbps\n";
-    eteLogsFile << "\tMean flow delay: " << measurements.flowsAverageDelay.As(Time::MS) << "\n";
-    eteLogsFile << "\tMedian flow delay: " << measurements.delayValuesMedian.As(Time::MS) << "\n";
-    statsFile << "\t" << (measurements.flowsAverageDelay.GetDouble() / 1000000) << "\t" << measurements.flowsAverageThroughput << "\t" << (measurements.flowsAverageMeanJitter.GetDouble()/1000000) <<  std::endl;
+    eteLogsFile << "\n\n\tAverage flow throughput: " << measurements.flowsAverageThroughput << " Mbps" << std::endl;
+    eteLogsFile << "\tAverage flow delay: " << measurements.flowsAverageDelay.As(Time::MS) << std::endl;
+    eteLogsFile << "\tAverage flow jitter: " << measurements.flowsAverageMeanJitter.As(Time::MS) << std::endl;
+    eteLogsFile << "\tMedian flow delay: " << measurements.delayValuesMedian.As(Time::MS) << std::endl << std::endl;
+    statsFile << "\t" << (measurements.flowsAverageDelay.GetDouble() / 1000000) << "\t" << measurements.flowsAverageThroughput << "\t" << (measurements.flowsAverageMeanJitter.GetDouble()/1000000) << std::endl;
 
-    // Now we check wheter or not we need to call a node-to-node mearurment
-    // std::optional<std::pair<int64_t,int64_t>> worstPerformingLink = nodeToNodeTrigger(monitor,node_to_node_doc_path);
-    // if (!(lastCalled == MilliSeconds(400))) 
-    // {
-    //     if(
-    //         measurements.flowsAverageThroughput < thresholds.flowsAverageThroughput || 
-    //         measurements.flowsAverageDelay > thresholds.flowsAverageDelay
-    //     ){
-    //         MEASURING_TIME = NETWORK_NOT_OK_MEASURING_TIME; 
-    //         eteLogsFile << "\n\tavg. threshold surpassed " << "\n";
-    //         if (worstPerformingLink.has_value()) {
-    //             eteLogsFile << "\tWorst performing link: ("<< worstPerformingLink.value().first << "," << worstPerformingLink.value().second << ")" << std::endl;
-                
-    //         }
-    //     } 
-    //     else {
-    //         MEASURING_TIME = NETWORK_OK_MEASURING_TIME;
-    //         eteLogsFile << "\n\tavg. under threshold " << "\n";
-    //     }
-    // } else {
-    //     thresholds.flowsAverageThroughput =  measurements.flowsAverageThroughput;
-    //     thresholds.flowsAverageDelay =  measurements.flowsAverageDelay;
-    // }
+    bool triggerFlag = false;
+    std::optional<std::pair<int64_t,int64_t>> worstPerformingLink;
+    // lastCalled has to be compared to the time when apps started
+    if (!(lastCalled == MilliSeconds(400))) {
+        // Now we check wheter or not we need to call a node-to-node mearurment
+        if( (thresholds.flowsAverageThroughput - measurements.flowsAverageThroughput) >= (thresholds.flowsAverageThroughput * RELATIVE_THRESHOLD_THROUGHPUT_ACCEPTANCE)){ // If the throughput is less than 90% of what's expected
+
+            triggerFlag = true;
+            NEXT_MEASURE_IN = NETWORK_NOT_OK_MEASURING_TIME; 
+            eteLogsFile << "\tAverage throughput surpassing threshold: " << (measurements.flowsAverageThroughput) << " < " << (thresholds.flowsAverageThroughput * RELATIVE_THRESHOLD_THROUGHPUT_ACCEPTANCE) << std::endl;
+            worstPerformingLink = nodeToNodeTrigger(monitor,node_to_node_doc_path);
+        }
+        if( (measurements.flowsAverageDelay - thresholds.flowsAverageDelay) >= (thresholds.flowsAverageDelay * RELATIVE_THRESHOLD_DELAY_ACCEPTANCE)) {  // If the meanDelay surpasses the expected value by 10%
+            NEXT_MEASURE_IN = NETWORK_NOT_OK_MEASURING_TIME; 
+            eteLogsFile << "\tAverage delay surpassing Delay: " << (measurements.flowsAverageDelay ) <<  " > " <<(thresholds.flowsAverageDelay * RELATIVE_THRESHOLD_DELAY_ACCEPTANCE) << std::endl;
+            if (!triggerFlag) {
+                worstPerformingLink = nodeToNodeTrigger(monitor,node_to_node_doc_path);
+            }
+            triggerFlag = true;
+        }
+        if( (measurements.flowsAverageMeanJitter - thresholds.flowsAverageMeanJitter) >= (thresholds.flowsAverageMeanJitter*RELATIVE_THRESHOLD_JITTER_ACCEPTANCE) ){ // If the meanJitter surpasses the expected value by 10%
+            NEXT_MEASURE_IN = NETWORK_NOT_OK_MEASURING_TIME; 
+            eteLogsFile << "\tAverage Jitter surpassing threshold" << (measurements.flowsAverageMeanJitter ) << " > " << (thresholds.flowsAverageMeanJitter*RELATIVE_THRESHOLD_JITTER_ACCEPTANCE) << std::endl;
+            if (!triggerFlag) {
+                worstPerformingLink = nodeToNodeTrigger(monitor,node_to_node_doc_path);
+            }
+            triggerFlag = true;
+        }
+        if (!triggerFlag) {
+            NEXT_MEASURE_IN = NETWORK_OK_MEASURING_TIME;
+            eteLogsFile << "\n\t Perforance under threshold(good)" << std::endl;
+        } else if (worstPerformingLink.has_value()) {
+            eteLogsFile << "\tWorst performing link: ("<< worstPerformingLink.value().first << "," << worstPerformingLink.value().second << ")" << std::endl;
+        }
+    } else {
+        // Initialize the thresholds with the first measurment
+        thresholds.flowsAverageThroughput =  measurements.flowsAverageThroughput;
+        thresholds.flowsAverageDelay =  measurements.flowsAverageDelay;
+        thresholds.flowsAverageMeanJitter =  measurements.flowsAverageMeanJitter;
+    }
     eteLogsFile.close();
     statsFile.close();
 
     // We reset all stats to ensure that we're not reusing them for the next iteration
     monitor->ResetAllStats();
-    std::cout << "finished with reportFlowStats" << std::endl;
 
-    // If there isn't time for next measurment...
-    if ((simTime - Simulator::Now()) < MilliSeconds(1000)){
+    // If there isn't time for next measurment...we stop
+    if ((simTime - Simulator::Now()) < NEXT_MEASURE_IN){
         std::cout << Simulator::Now().As(Time::MS) << std::endl;
         std::cout << (simTime - Simulator::Now()).As(Time::MS)<< std::endl;
         Simulator::Stop(simTime - Simulator::Now());
     } else {
-        Simulator::Schedule(MilliSeconds(1000),&reportFlowStats,monitor,classifier,filename,Simulator::Now(),simTime,thresholds);
+        Simulator::Schedule(NEXT_MEASURE_IN,&reportFlowStats,monitor,classifier,filename,Simulator::Now(),simTime,thresholds);
     }
 }
